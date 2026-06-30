@@ -3,95 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>퀴즈 화면 — 프로젝터</title>
+  <title>퀴즈 RPG — 프로젝터</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/games.css">
 </head>
-<body class="display-body" id="display-body">
+<body class="display-body">
 
-  <!-- ── Castle Game ── -->
-  <div id="g-castle" class="hidden">
-    <canvas id="castle-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-    <div class="castle-wall"></div>
-    <div class="castle-stage">
-      <div class="castle-crown">👑</div>
-      <div class="castle-q-card">
-        <div class="castle-q-num" id="castle-q-num">문제 준비 중…</div>
-        <div class="castle-q-text" id="castle-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
-      </div>
-      <div class="castle-ox-wrap" id="castle-ox">
-        <div class="castle-ox-btn O">O</div>
-        <div style="font-size:2.5rem; color:rgba(212,175,55,.4);">VS</div>
-        <div class="castle-ox-btn X">X</div>
-      </div>
-      <div class="castle-explain hidden" id="castle-explain"></div>
+<!-- ── Background canvas ── -->
+<canvas id="rpg-canvas"></canvas>
+<div class="scanlines"></div>
+
+<!-- ════════════════ SCENE: IDLE ════════════════ -->
+<div class="scene active" id="scene-idle">
+  <div class="idle-logo">⚔️</div>
+  <div class="idle-title">초등 교실 퀴즈 RPG</div>
+  <div class="idle-sub">선생님이 캠페인을 시작할 때까지 기다려주세요</div>
+</div>
+
+<!-- ════════════════ SCENE: WORLD MAP ════════════════ -->
+<div class="scene" id="scene-map">
+  <div class="map-title" id="map-title">🗺️ 캠페인 지도</div>
+  <div class="map-path" id="map-path"></div>
+  <div class="map-teams" id="map-teams"></div>
+</div>
+
+<!-- ════════════════ SCENE: BATTLE (normal + boss + final) ════════════════ -->
+<div class="scene" id="scene-battle">
+  <div class="battle-layout">
+    <!-- Left: Team panels -->
+    <div class="battle-teams" id="battle-teams">
+      <div class="battle-phase-tag" id="battle-phase-tag">전투 중</div>
     </div>
-    <!-- Castle score row -->
-    <div id="castle-scores" style="position:absolute;top:18px;right:24px;display:flex;gap:10px;z-index:20"></div>
-  </div>
 
-  <!-- ── Space Game ── -->
-  <div id="g-space" class="hidden">
-    <canvas id="space-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-    <div class="space-nebula"></div>
-    <div class="space-stage">
-      <div class="space-progress-track" style="max-width:860px;width:100%">
-        <div class="space-progress-fill" id="space-fill" style="width:0%"></div>
-        <div class="space-ship" id="space-ship" style="left:0%">🚀</div>
-        <div class="space-planet">🪐</div>
-      </div>
-      <div class="space-q-card">
-        <div class="space-q-num" id="space-q-num">준비 중…</div>
-        <div class="space-q-text" id="space-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
-      </div>
-      <div class="space-opts" id="space-opts"></div>
-      <div class="space-explain hidden" id="space-explain"></div>
-    </div>
-    <div id="space-scores" style="position:absolute;top:18px;right:24px;display:flex;gap:10px;z-index:20"></div>
-  </div>
+    <!-- Center: Monster + Question -->
+    <div class="battle-center" id="battle-center">
+      <!-- Stage info top -->
+      <div style="text-align:center;font-size:.72rem;letter-spacing:.18em;color:rgba(255,255,255,.35);text-transform:uppercase" id="battle-stage-tag">던전 1</div>
 
-  <!-- ── Show Game ── -->
-  <div id="g-show" class="hidden">
-    <div class="show-grid"></div>
-    <div class="show-scanlines"></div>
-    <div class="show-stage">
-      <div class="show-header">
-        <div class="show-title">⚡ 번개 퀴즈쇼 ⚡</div>
-        <div class="show-timer-wrap" id="show-timer-wrap">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="timer-bg" cx="40" cy="40" r="35"/>
-            <circle class="timer-ring" id="timer-ring" cx="40" cy="40" r="35"/>
-          </svg>
-          <div class="timer-num" id="timer-num">—</div>
+      <!-- Monster -->
+      <div class="monster-area">
+        <span class="monster-emoji" id="monster-emoji">🐉</span>
+        <div class="monster-name" id="monster-name" style="color:#F87171">드래곤</div>
+        <div class="monster-hp-wrap">
+          <div class="monster-hp-bg">
+            <div class="monster-hp-fill" id="monster-hp-fill" style="width:100%"></div>
+          </div>
+          <div class="monster-hp-text" id="monster-hp-text">100/100</div>
         </div>
       </div>
-      <div class="show-q-card">
-        <div class="show-q-num" id="show-q-num">준비 중…</div>
-        <div class="show-q-text" id="show-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
+
+      <!-- Question card -->
+      <div class="rpg-q-card" id="rpg-q-card">
+        <div class="rpg-q-num" id="rpg-q-num">문제 1/4</div>
+        <div class="rpg-q-text" id="rpg-q-text">문제 내용이 여기에 표시됩니다.</div>
+        <div class="rpg-opts" id="rpg-opts"></div>
+        <div class="rpg-explain hidden" id="rpg-explain"></div>
       </div>
-      <div class="space-opts" id="show-opts" style="max-width:900px;width:100%"></div>
-      <div class="space-explain hidden" id="show-explain" style="max-width:900px;width:100%;color:#FFF8E1;border-color:rgba(255,220,0,.4);background:rgba(255,220,0,.08)"></div>
-      <div class="show-scores" id="show-scores"></div>
+
+      <!-- Floating numbers layer -->
+      <div id="floaters" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
     </div>
-    <div class="show-lightning" id="show-lightning"></div>
-  </div>
 
-  <!-- ── Waiting Overlay ── -->
-  <div class="waiting-screen" id="waiting-screen">
-    <div class="waiting-icon">🎮</div>
-    <div class="waiting-text">초등 교실 퀴즈</div>
-    <div class="waiting-sub">선생님이 게임을 시작할 때까지 기다려주세요</div>
+    <!-- Right: Skills + Unit info -->
+    <div class="battle-sidebar">
+      <div class="sidebar-stage">
+        단원<strong id="sidebar-unit-name">—</strong>
+      </div>
+      <div style="margin-top:auto">
+        <div class="skills-section-title">스킬</div>
+        <div id="display-skills"></div>
+      </div>
+    </div>
   </div>
+</div>
 
-  <!-- ── Finish Podium ── -->
-  <div class="finish-screen" id="finish-screen">
-    <div class="finish-title">🎉 게임 종료! 🎉</div>
-    <div class="podium-row" id="podium-row"></div>
-  </div>
+<!-- ════════════════ SCENE: CHECKPOINT ════════════════ -->
+<div class="scene" id="scene-checkpoint">
+  <div class="camp-fire">🔥</div>
+  <div class="checkpoint-title" id="ckpt-title">체크포인트 🏕️</div>
+  <div class="checkpoint-unit" id="ckpt-unit"></div>
+  <div class="checkpoint-teams" id="ckpt-teams"></div>
+  <div class="checkpoint-next">▷ 선생님이 다음 단계를 진행합니다…</div>
+</div>
 
-  <script src="assets/js/state.js"></script>
-  <script src="assets/js/display.js"></script>
+<!-- ════════════════ SCENE: VICTORY ════════════════ -->
+<div class="scene" id="scene-victory">
+  <div class="victory-title">🎉 캠페인 클리어! 🎉</div>
+  <div class="podium-row" id="podium-row"></div>
+</div>
+
+<script src="assets/js/state.js"></script>
+<script src="assets/js/rpg.js"></script>
+<script src="assets/js/display.js"></script>
 </body>
 </html>

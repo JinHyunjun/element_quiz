@@ -1,393 +1,434 @@
-/* ───────────────────────────────────────────
-   초등 교실 퀴즈 — 프로젝터 Display 로직
-─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   초등 교실 퀴즈 RPG — 프로젝터 Display 로직
+════════════════════════════════════════════════════ */
 
 let prevState = null;
-let timerInterval = null;
-let timerLeft = 0;
-let timerTotal = 30;
 
-// ── Canvas Star Helpers ──
-function initStarfield(canvasId, count, speed) {
-  const canvas = document.getElementById(canvasId);
+// ── Canvas starfield ──
+(function initStarfield() {
+  const canvas = document.getElementById('rpg-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const stars = [];
+
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
   resize();
   window.addEventListener('resize', resize);
-  for (let i = 0; i < count; i++) {
+
+  for (let i = 0; i < 260; i++) {
     stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.8 + 0.2,
-      s: (Math.random() + 0.3) * speed,
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.6 + 0.2,
       o: Math.random(),
     });
   }
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(star => {
-      star.o += (Math.random() - 0.5) * 0.04;
-      star.o = Math.max(0.1, Math.min(1, star.o));
+    stars.forEach(s => {
+      s.o += (Math.random() - 0.5) * 0.03;
+      s.o = Math.max(0.05, Math.min(1, s.o));
       ctx.beginPath();
-      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${star.o})`;
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.o})`;
       ctx.fill();
     });
     requestAnimationFrame(draw);
   }
   draw();
-}
+})();
 
-// ── Show / Hide game panels ──
-function showGame(type) {
-  ['castle','space','show'].forEach(g => {
-    document.getElementById('g-' + g).classList.toggle('hidden', g !== type);
+// ── Scene management ──
+const SCENES = ['idle', 'map', 'battle', 'checkpoint', 'victory'];
+
+function showScene(name) {
+  SCENES.forEach(id => {
+    const el = document.getElementById('scene-' + id);
+    if (el) el.classList.toggle('active', id === name);
   });
 }
 
-// ── Score chips (castle / space) ──
-function buildScoreChips(containerId, teams, theme) {
-  const el = document.getElementById(containerId);
+// ── Floating numbers ──
+function spawnFloat(text, cls, x, y) {
+  const layer = document.getElementById('floaters');
+  if (!layer) return;
+  const el = document.createElement('div');
+  el.className = 'float-num ' + cls;
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function spawnRandomFloat(text, cls) {
+  const el = document.getElementById('battle-center');
   if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const x = 80 + Math.random() * (rect.width - 160);
+  const y = 60 + Math.random() * 140;
+  spawnFloat(text, cls, x, y);
+}
+
+// ── Scene: Idle ──
+function renderIdle() { showScene('idle'); }
+
+// ── Scene: World Map ──
+function renderMap(state) {
+  showScene('map');
+  const units = state.selectedUnits || [];
+  const title = document.getElementById('map-title');
+  title.textContent = `🗺️ ${state.grade}학년 ${state.subject} 캠페인`;
+
+  const path = document.getElementById('map-path');
+  path.innerHTML = '';
+
+  units.forEach((unit, i) => {
+    const done    = (state.completedUnitIndexes || []).includes(i);
+    const current = state.currentUnitIndex === i && state.phase !== 'world_map';
+
+    const node = document.createElement('div');
+    node.className = 'map-node';
+
+    const icon = document.createElement('div');
+    icon.className = 'map-node-icon ' + (done ? 'done' : current ? 'current' : 'locked');
+    icon.textContent = done ? '✅' : current ? '⚔️' : `${i+1}`;
+
+    const name = document.createElement('div');
+    name.className = 'map-node-name';
+    name.textContent = unit.replace(/^\d+\.\s*/, '').substring(0, 12);
+
+    const status = document.createElement('div');
+    status.className = 'map-node-status';
+    status.textContent = done ? '클리어' : current ? '진행 중' : '잠김';
+
+    node.appendChild(icon);
+    node.appendChild(name);
+    node.appendChild(status);
+    path.appendChild(node);
+
+    // Connector (not after last unit)
+    if (i < units.length - 1) {
+      const conn = document.createElement('div');
+      conn.className = 'map-connector' + (done ? ' done-line' : '');
+      path.appendChild(conn);
+    }
+  });
+
+  // Final boss node
+  const fbConn = document.createElement('div');
+  fbConn.className = 'map-connector';
+  path.appendChild(fbConn);
+
+  const fbNode = document.createElement('div');
+  fbNode.className = 'map-node';
+  const fbIcon = document.createElement('div');
+  fbIcon.className = 'map-node-icon final-node';
+  fbIcon.textContent = '😈';
+  const fbName = document.createElement('div');
+  fbName.className = 'map-node-name';
+  fbName.textContent = '최종 보스';
+  const fbStatus = document.createElement('div');
+  fbStatus.className = 'map-node-status';
+  fbStatus.textContent = state.phase === 'final_boss' ? '전투 중' : '잠김';
+  fbNode.appendChild(fbIcon);
+  fbNode.appendChild(fbName);
+  fbNode.appendChild(fbStatus);
+  path.appendChild(fbNode);
+
+  // Team chips
+  renderMapTeams(state);
+}
+
+function renderMapTeams(state) {
+  const el = document.getElementById('map-teams');
   el.innerHTML = '';
-  (teams || []).forEach(t => {
+  (state.teams || []).forEach(t => {
     const chip = document.createElement('div');
-    chip.style.cssText = `
-      background:rgba(0,0,0,.5); border:2px solid ${t.color};
-      border-radius:12px; padding:6px 16px; text-align:center;
-      color:#fff; font-weight:700; font-size:.9rem; min-width:80px;
+    chip.className = 'map-team-chip';
+    chip.innerHTML = `
+      <div class="map-team-name" style="color:${t.color}">${t.name}</div>
+      <div class="map-team-hp">❤️ ${t.hp}/${t.maxHp}</div>
+      <div class="map-team-gold">💰 ${t.gold}G</div>
     `;
-    chip.innerHTML = `<div style="color:${t.color};font-size:.75rem">${t.name}</div><div style="font-size:1.3rem">${t.score}</div>`;
     el.appendChild(chip);
   });
 }
 
-// ── Show score bars (show theme) ──
-function buildShowScores(teams) {
-  const el = document.getElementById('show-scores');
-  if (!el) return;
-  el.innerHTML = '';
-  const maxScore = Math.max(1, ...teams.map(t => t.score));
-  teams.forEach(t => {
-    const item = document.createElement('div');
-    item.className = 'show-score-item';
-    const bar = document.createElement('div');
-    bar.className = 'show-score-bar';
-    bar.style.height = Math.round((t.score / maxScore) * 60) + '%';
-    const name = document.createElement('div');
-    name.className = 'show-score-name';
-    name.textContent = t.name;
-    name.style.color = t.color;
-    const val = document.createElement('div');
-    val.className = 'show-score-val';
-    val.textContent = t.score;
-    item.appendChild(bar);
-    item.appendChild(name);
-    item.appendChild(val);
-    el.appendChild(item);
+// ── Scene: Battle ──
+function renderBattle(state) {
+  showScene('battle');
+
+  // Phase tag
+  const tag = document.getElementById('battle-phase-tag');
+  const stageTag = document.getElementById('battle-stage-tag');
+  if (state.isFinalBoss) {
+    tag.textContent = '⚡ 최종 보스전';
+    tag.style.color = '#C084FC';
+    stageTag.textContent = '전 단원 복습전';
+  } else if (state.isBoss) {
+    tag.textContent = '🐉 보스 전투';
+    tag.style.color = '#F87171';
+    stageTag.textContent = `던전 ${state.currentUnitIndex+1} 보스`;
+  } else {
+    tag.textContent = '⚔️ 전투 중';
+    tag.style.color = 'rgba(255,255,255,.4)';
+    stageTag.textContent = `던전 ${state.currentUnitIndex+1} / ${(state.selectedUnits||[]).length}`;
+  }
+
+  // Sidebar unit name
+  const unitName = document.getElementById('sidebar-unit-name');
+  unitName.textContent = state.isFinalBoss ? '최종 보스' : (state.selectedUnits?.[state.currentUnitIndex] || '—');
+
+  // Monster
+  const monster = state.monster;
+  if (monster) {
+    document.getElementById('monster-emoji').textContent = monster.emoji || '🐉';
+    const nameEl = document.getElementById('monster-name');
+    nameEl.textContent = monster.name || '?';
+    nameEl.style.color = monster.color || '#F87171';
+    const hpPct = monster.maxHp > 0 ? Math.round((monster.hp / monster.maxHp) * 100) : 0;
+    document.getElementById('monster-hp-fill').style.width = hpPct + '%';
+    document.getElementById('monster-hp-text').textContent = `${monster.hp} / ${monster.maxHp}`;
+  }
+
+  // Team panels
+  renderBattleTeams(state);
+
+  // Question
+  renderQuestion(state);
+
+  // Skills
+  renderDisplaySkills(state);
+
+  // Animations for last action
+  if (state.lastAction && state.lastAction.ts !== prevState?.lastAction?.ts) {
+    animateAction(state.lastAction);
+  }
+}
+
+function renderBattleTeams(state) {
+  const container = document.getElementById('battle-teams');
+  const tagEl = container.querySelector('.battle-phase-tag');
+
+  // Remove old team cards
+  container.querySelectorAll('.team-card').forEach(e => e.remove());
+
+  (state.teams || []).forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.style.borderColor = t.color;
+    card.style.color = t.color;
+
+    const hpPct = t.maxHp > 0 ? (t.hp / t.maxHp) * 100 : 0;
+    const hpClass = hpPct <= 30 ? 'low' : hpPct <= 60 ? 'mid' : '';
+
+    card.innerHTML = `
+      <div class="team-card-name">${t.name}</div>
+      <div class="team-hp-label">HP</div>
+      <div class="team-hp-bar-wrap">
+        <div class="team-hp-fill ${hpClass}" style="width:${hpPct}%"></div>
+      </div>
+      <div class="team-hp-nums">${t.hp} / ${t.maxHp}</div>
+      <div class="team-gold">💰 ${t.gold}G</div>
+      ${t.shieldActive ? '<div class="team-shield-active">🛡️ 방어 중</div>' : ''}
+    `;
+    container.appendChild(card);
   });
 }
 
-// ── Timer (show game) ──
-const CIRC = 2 * Math.PI * 35; // ≈ 220
-function startTimer(secs) {
-  stopTimer();
-  timerTotal = secs;
-  timerLeft = secs;
-  const ring = document.getElementById('timer-ring');
-  const num = document.getElementById('timer-num');
-  if (!ring || !num) return;
-  ring.style.strokeDasharray = CIRC;
-  ring.classList.remove('urgent');
-  num.classList.remove('urgent');
-  function tick() {
-    const ratio = timerLeft / timerTotal;
-    ring.style.strokeDashoffset = CIRC * (1 - ratio);
-    num.textContent = timerLeft;
-    const urgent = timerLeft <= 5;
-    ring.classList.toggle('urgent', urgent);
-    num.classList.toggle('urgent', urgent);
-    if (timerLeft <= 0) { stopTimer(); return; }
-    timerLeft--;
-  }
-  tick();
-  timerInterval = setInterval(tick, 1000);
-}
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-function pauseTimer() { stopTimer(); }
+function renderQuestion(state) {
+  const q = state.currentQuestions?.[state.currentQIndex];
 
-// ── Confetti ──
+  if (!q) {
+    document.getElementById('rpg-q-num').textContent  = '—';
+    document.getElementById('rpg-q-text').textContent = '선생님이 문제를 표시합니다…';
+    document.getElementById('rpg-opts').innerHTML     = '';
+    document.getElementById('rpg-explain').classList.add('hidden');
+    return;
+  }
+
+  const label = state.isFinalBoss ? '최종 보스' : (state.isBoss ? '보스' : `던전 ${state.currentUnitIndex+1}`);
+  document.getElementById('rpg-q-num').textContent  = `[${label}] 문제 ${state.currentQIndex+1} / ${state.currentQuestions.length}`;
+  document.getElementById('rpg-q-text').textContent = q.question;
+
+  const optsEl = document.getElementById('rpg-opts');
+  optsEl.innerHTML = '';
+
+  if (q.options) {
+    q.options.forEach((opt, i) => {
+      const row = document.createElement('div');
+      row.className = 'rpg-opt';
+
+      // Hint skill: mark eliminated options
+      if (state.activeSkill === 'hint' && i !== q.answer && !state.revealed) {
+        const wrongOpts = q.options
+          .map((_, idx) => idx)
+          .filter(idx => idx !== q.answer);
+        // Eliminate the first wrong one
+        if (i === wrongOpts[0]) { row.classList.add('hint-off'); }
+      }
+
+      if (state.revealed) {
+        row.classList.add(i === q.answer ? 'correct' : 'wrong');
+      }
+      const num = document.createElement('div');
+      num.className = 'rpg-opt-num';
+      num.textContent = ['①','②','③','④'][i];
+      const txt = document.createElement('span');
+      txt.textContent = opt;
+      row.appendChild(num); row.appendChild(txt);
+      optsEl.appendChild(row);
+    });
+  } else if (typeof q.answer === 'boolean') {
+    const wrap = document.createElement('div');
+    wrap.className = 'rpg-ox-wrap';
+    ['O','X'].forEach(ox => {
+      const btn = document.createElement('div');
+      btn.className = 'rpg-ox-btn ' + ox;
+      btn.textContent = ox;
+      if (state.revealed) {
+        const correct = q.answer ? 'O' : 'X';
+        btn.classList.add(ox === correct ? 'correct' : 'dim');
+      }
+      wrap.appendChild(btn);
+    });
+    optsEl.appendChild(wrap);
+  }
+
+  const explainEl = document.getElementById('rpg-explain');
+  if (state.revealed && q.explanation) {
+    explainEl.textContent = '💡 ' + q.explanation;
+    explainEl.classList.remove('hidden');
+  } else {
+    explainEl.classList.add('hidden');
+  }
+}
+
+function renderDisplaySkills(state) {
+  const el = document.getElementById('display-skills');
+  el.innerHTML = '';
+  Object.entries(RPG.SKILLS).forEach(([key, skill]) => {
+    const unlocked = (state.unlockedSkills || []).includes(key);
+    const isActive = state.activeSkill === key;
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip ' + (isActive ? 'active' : (unlocked ? 'ready' : 'locked'));
+    chip.innerHTML = `${skill.emoji} <span style="font-size:.72rem">${skill.name}</span>`;
+    el.appendChild(chip);
+  });
+}
+
+function animateAction(action) {
+  if (!action) return;
+  if (action.type === 'correct') {
+    spawnRandomFloat(`+${action.gold}G`, 'float-gold');
+    spawnRandomFloat(`-${action.monsterDamage}`, 'float-damage');
+    // Monster hit shake
+    const emoji = document.getElementById('monster-emoji');
+    if (emoji) { emoji.classList.remove('hit'); void emoji.offsetWidth; emoji.classList.add('hit'); }
+  } else if (action.type === 'wrong') {
+    if (action.blocked) {
+      spawnRandomFloat('🛡️ BLOCK!', 'float-shield');
+    } else {
+      spawnRandomFloat(`-${action.teamDamage} HP`, 'float-damage');
+    }
+  }
+}
+
+// ── Scene: Checkpoint ──
+function renderCheckpoint(state) {
+  showScene('checkpoint');
+  const unitName = state.selectedUnits?.[state.currentUnitIndex] || '';
+  document.getElementById('ckpt-title').textContent = `🏕️ 체크포인트 — 던전 ${state.currentUnitIndex+1} 클리어!`;
+  document.getElementById('ckpt-unit').textContent  = unitName;
+
+  const teamsEl = document.getElementById('ckpt-teams');
+  teamsEl.innerHTML = '';
+  (state.teams || []).forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'checkpoint-team';
+    card.style.borderColor = t.color;
+    card.innerHTML = `
+      <div class="ckpt-name" style="color:${t.color}">${t.name}</div>
+      <div class="ckpt-hp">❤️ HP ${t.hp} / ${t.maxHp}</div>
+      <div class="ckpt-gold">💰 ${t.gold}G</div>
+      <div class="ckpt-heal-badge">+${RPG.CHECKPOINT_HEAL} HP 회복!</div>
+    `;
+    teamsEl.appendChild(card);
+  });
+}
+
+// ── Scene: Victory ──
+function renderVictory(state) {
+  showScene('victory');
+  const row = document.getElementById('podium-row');
+  row.innerHTML = '';
+
+  const sorted = [...(state.teams || [])].sort((a, b) => b.gold - a.gold);
+  const medals = ['🥇','🥈','🥉'];
+  const heights = [120, 90, 65];
+  const order   = sorted.length >= 3 ? [1, 0, 2] : sorted.map((_, i) => i);
+
+  order.forEach(rank => {
+    const t = sorted[rank];
+    if (!t) return;
+    const item = document.createElement('div');
+    item.className = 'podium-item';
+    item.style.animation = `fadeSlide .6s ease ${rank*.18}s both`;
+    item.innerHTML = `
+      <div class="podium-medal">${medals[rank] || '🏅'}</div>
+      <div class="podium-name">${t.name}</div>
+      <div class="podium-score">${t.gold}G</div>
+      <div class="podium-hp">❤️ ${t.hp}HP 남음</div>
+      <div class="podium-block" style="height:${heights[rank]||50}px;background:${t.color}33;border:2px solid ${t.color}"></div>
+    `;
+    row.appendChild(item);
+  });
+
+  launchConfetti();
+}
+
 function launchConfetti() {
-  const colors = ['#FFD700','#FF4444','#00BFFF','#10B981','#F59E0B','#8B5CF6','#FF69B4'];
-  for (let i = 0; i < 90; i++) {
+  const colors = ['#FFD700','#EF4444','#3B82F6','#10B981','#F59E0B','#8B5CF6','#F472B6'];
+  for (let i = 0; i < 100; i++) {
     setTimeout(() => {
       const dot = document.createElement('div');
       dot.className = 'confetti-dot';
       dot.style.left = Math.random() * 100 + 'vw';
-      dot.style.top = '-20px';
       dot.style.background = colors[Math.floor(Math.random() * colors.length)];
       dot.style.animationDuration = (2.5 + Math.random() * 2) + 's';
-      dot.style.animationDelay = (Math.random() * 1.5) + 's';
-      dot.style.transform = `rotate(${Math.random() * 360}deg)`;
+      dot.style.animationDelay = Math.random() * 1.5 + 's';
       document.body.appendChild(dot);
       setTimeout(() => dot.remove(), 5000);
     }, i * 30);
   }
 }
 
-// ── Podium ──
-function buildPodium(teams) {
-  const row = document.getElementById('podium-row');
-  if (!row) return;
-  const sorted = [...teams].sort((a, b) => b.score - a.score);
-  const order = sorted.length >= 3 ? [1, 0, 2] : sorted.map((_, i) => i);
-  const medals = ['🥇','🥈','🥉'];
-  const heights = [110, 80, 60];
-  row.innerHTML = '';
-  order.forEach(rank => {
-    const t = sorted[rank];
-    if (!t) return;
-    const item = document.createElement('div');
-    item.className = 'podium-item';
-    item.style.animation = `fadeIn .6s ease ${rank * .2}s both`;
-    const rankEl = document.createElement('div');
-    rankEl.className = 'podium-rank';
-    rankEl.textContent = medals[rank] || '🏅';
-    const nameEl = document.createElement('div');
-    nameEl.className = 'podium-name';
-    nameEl.textContent = t.name;
-    const scoreEl = document.createElement('div');
-    scoreEl.className = 'podium-score';
-    scoreEl.textContent = t.score + '점';
-    const block = document.createElement('div');
-    block.className = 'podium-block';
-    block.style.cssText = `height:${heights[rank] || 50}px; background:${t.color}33; border: 2px solid ${t.color};`;
-    item.appendChild(rankEl);
-    item.appendChild(nameEl);
-    item.appendChild(scoreEl);
-    item.appendChild(block);
-    row.appendChild(item);
-  });
-}
-
-// ── Castle renderer ──
-function renderCastle(state) {
-  buildScoreChips('castle-scores', state.teams, 'castle');
-  const q = state.questions?.[state.currentIndex];
-
-  if (!q) {
-    document.getElementById('castle-q-num').textContent = '게임 시작 전';
-    document.getElementById('castle-q-text').textContent = '선생님이 문제를 표시하면 여기에 나타납니다.';
-    document.getElementById('castle-ox').innerHTML =
-      `<div class="castle-ox-btn O">O</div><div style="font-size:2.5rem;color:rgba(212,175,55,.4)">VS</div><div class="castle-ox-btn X">X</div>`;
-    document.getElementById('castle-explain').classList.add('hidden');
-    return;
-  }
-
-  document.getElementById('castle-q-num').textContent =
-    `📜 문제 ${state.currentIndex + 1} / ${state.questions.length}`;
-  document.getElementById('castle-q-text').textContent = q.question;
-
-  const oxWrap = document.getElementById('castle-ox');
-  const correctOX = q.answer === true ? 'O' : 'X';
-  oxWrap.innerHTML = '';
-  ['O','X'].forEach(ox => {
-    const btn = document.createElement('div');
-    btn.className = 'castle-ox-btn ' + ox;
-    btn.textContent = ox;
-    if (state.revealed) {
-      btn.classList.add(ox === correctOX ? 'correct' : 'wrong');
-    }
-    oxWrap.appendChild(btn);
-    if (ox === 'O') {
-      const vs = document.createElement('div');
-      vs.style.cssText = 'font-size:2.5rem;color:rgba(212,175,55,.4)';
-      vs.textContent = 'VS';
-      oxWrap.appendChild(vs);
-    }
-  });
-
-  const explainEl = document.getElementById('castle-explain');
-  if (state.revealed && q.explanation) {
-    explainEl.textContent = '💡 ' + q.explanation;
-    explainEl.classList.remove('hidden');
-  } else {
-    explainEl.classList.add('hidden');
-  }
-}
-
-// ── Space renderer ──
-function renderSpace(state) {
-  buildScoreChips('space-scores', state.teams, 'space');
-  const total = state.questions?.length || 1;
-  const idx = state.currentIndex >= 0 ? state.currentIndex : -1;
-  const pct = idx < 0 ? 0 : Math.round(((idx + 1) / total) * 92);
-  document.getElementById('space-fill').style.width = pct + '%';
-  document.getElementById('space-ship').style.left = pct + '%';
-
-  const q = state.questions?.[state.currentIndex];
-  if (!q) {
-    document.getElementById('space-q-num').textContent = '🛸 출발 준비 중…';
-    document.getElementById('space-q-text').textContent = '선생님이 문제를 표시하면 나타납니다.';
-    document.getElementById('space-opts').innerHTML = '';
-    document.getElementById('space-explain').classList.add('hidden');
-    return;
-  }
-
-  document.getElementById('space-q-num').textContent =
-    `🛸 문제 ${state.currentIndex + 1} / ${state.questions.length}`;
-  document.getElementById('space-q-text').textContent = q.question;
-
-  const opts = document.getElementById('space-opts');
-  opts.innerHTML = '';
-  (q.options || []).forEach((opt, i) => {
-    const row = document.createElement('div');
-    row.className = 'space-opt';
-    if (state.revealed) {
-      row.classList.add(i === q.answer ? 'correct' : 'wrong');
-    }
-    const num = document.createElement('div');
-    num.className = 'space-opt-num';
-    num.textContent = ['①','②','③','④'][i];
-    const txt = document.createElement('span');
-    txt.textContent = opt;
-    row.appendChild(num);
-    row.appendChild(txt);
-    opts.appendChild(row);
-  });
-
-  const explainEl = document.getElementById('space-explain');
-  if (state.revealed && q.explanation) {
-    explainEl.textContent = '💡 ' + q.explanation;
-    explainEl.classList.remove('hidden');
-  } else {
-    explainEl.classList.add('hidden');
-  }
-}
-
-// ── Show renderer ──
-function renderShow(state) {
-  buildShowScores(state.teams || []);
-  const q = state.questions?.[state.currentIndex];
-
-  if (!q) {
-    document.getElementById('show-q-num').textContent = '⚡ 대기 중…';
-    document.getElementById('show-q-text').textContent = '선생님이 문제를 표시하면 나타납니다.';
-    document.getElementById('show-opts').innerHTML = '';
-    document.getElementById('show-explain').classList.add('hidden');
-    stopTimer();
-    document.getElementById('timer-num').textContent = '—';
-    return;
-  }
-
-  document.getElementById('show-q-num').textContent =
-    `⚡ 문제 ${state.currentIndex + 1} / ${state.questions.length}`;
-  document.getElementById('show-q-text').textContent = q.question;
-
-  const opts = document.getElementById('show-opts');
-  opts.innerHTML = '';
-  (q.options || []).forEach((opt, i) => {
-    const row = document.createElement('div');
-    row.className = 'space-opt';
-    if (state.revealed) row.classList.add(i === q.answer ? 'correct' : 'wrong');
-    const num = document.createElement('div');
-    num.className = 'space-opt-num';
-    num.textContent = ['①','②','③','④'][i];
-    const txt = document.createElement('span');
-    txt.textContent = opt;
-    row.appendChild(num);
-    row.appendChild(txt);
-    opts.appendChild(row);
-  });
-
-  const explainEl = document.getElementById('show-explain');
-  if (state.revealed && q.explanation) {
-    explainEl.textContent = '💡 ' + q.explanation;
-    explainEl.classList.remove('hidden');
-  } else {
-    explainEl.classList.add('hidden');
-  }
-}
-
-// ── Lightning flash effect ──
-function fireLightning() {
-  const el = document.getElementById('show-lightning');
-  if (!el) return;
-  el.classList.remove('fire');
-  void el.offsetWidth;
-  el.classList.add('fire');
-  setTimeout(() => el.classList.remove('fire'), 650);
-}
-
-// ── Main render dispatch ──
+// ── Main render ──
 function render(state) {
-  if (!state) return;
+  if (!state) { renderIdle(); return; }
 
-  const waiting = document.getElementById('waiting-screen');
-  const finish  = document.getElementById('finish-screen');
+  const phase = state.phase;
 
-  // Finish
-  if (state.status === 'finished') {
-    waiting.style.display = 'none';
-    finish.classList.add('show');
-    buildPodium(state.teams || []);
-    launchConfetti();
-    stopTimer();
-    return;
+  if (!phase || phase === 'idle') { renderIdle(); return; }
+  if (phase === 'world_map')      { renderMap(state); }
+  else if (phase === 'battle' || phase === 'boss_battle' || phase === 'final_boss') {
+    renderBattle(state);
   }
-
-  finish.classList.remove('show');
-
-  // Show the right game
-  const gameType = state.game || 'castle';
-  showGame(gameType);
-  document.body.className = 'display-body game-' + gameType;
-
-  // Waiting (no question shown yet)
-  if (state.currentIndex < 0 || state.status === 'waiting') {
-    waiting.style.display = 'flex';
-  } else {
-    waiting.style.display = 'none';
-  }
-
-  // Detect question change to start timer
-  const qChanged = prevState?.currentIndex !== state.currentIndex;
-  const revealChanged = !prevState?.revealed && state.revealed;
-
-  if (gameType === 'castle') renderCastle(state);
-  if (gameType === 'space')  renderSpace(state);
-  if (gameType === 'show') {
-    renderShow(state);
-    if (qChanged && state.currentIndex >= 0 && !state.revealed) {
-      startTimer(state.timerSeconds || 15);
-    }
-    if (revealChanged) {
-      pauseTimer();
-      fireLightning();
-    }
-  }
+  else if (phase === 'checkpoint') { renderCheckpoint(state); }
+  else if (phase === 'victory' || phase === 'victory_final') { renderVictory(state); }
 
   prevState = state;
 }
 
 // ── Init ──
-function init() {
-  // Start star animations
-  initStarfield('castle-canvas', 200, 0.3);
-  initStarfield('space-canvas', 280, 0.5);
-
+document.addEventListener('DOMContentLoaded', () => {
   EQ_STATE.init(newState => render(newState));
-
-  // Load current state immediately
-  const current = EQ_STATE.get();
-  if (current) render(current);
-}
-
-document.addEventListener('DOMContentLoaded', init);
+  const cur = EQ_STATE.get();
+  if (cur) render(cur);
+  else renderIdle();
+});

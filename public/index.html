@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>초등 교실 퀴즈 — 선생님 화면</title>
+  <title>초등 교실 퀴즈 RPG — 선생님 화면</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -12,14 +12,14 @@
 <body>
 
 <header class="site-header">
-  <span style="font-size:1.6rem">🎓</span>
-  <h1>초등 교실 퀴즈</h1>
-  <span class="tagline">2022 개정 교육과정 · AI 퀴즈 자동 생성</span>
+  <span style="font-size:1.6rem">⚔️</span>
+  <h1>초등 교실 퀴즈 RPG</h1>
+  <span class="tagline">2022 개정 교육과정 · AI 던전 어드벤처</span>
 </header>
 
 <div class="wrap">
 
-  <!-- ── PHASE 1: 커리큘럼 선택 ── -->
+  <!-- ── PHASE 1: 커리큘럼 + 단원 선택 ── -->
   <div class="phase active" id="phase-setup">
     <div class="card">
       <div class="card-title"><span class="step-num">1</span> 학년 선택</div>
@@ -47,61 +47,36 @@
     </div>
 
     <div class="card" id="unit-card" style="display:none">
-      <div class="card-title"><span class="step-num">4</span> 단원 선택</div>
-      <div class="unit-list" id="unit-list"></div>
+      <div class="card-title"><span class="step-num">4</span> 던전 선택 <span style="font-size:.75rem;font-weight:500;color:#64748B;margin-left:8px">(최소 1개 · 최대 5개)</span></div>
+      <div class="unit-ctrl-row">
+        <button class="unit-ctrl-btn" id="btn-select-all">전체 선택</button>
+        <button class="unit-ctrl-btn" id="btn-deselect-all">전체 해제</button>
+      </div>
+      <div class="unit-check-list" id="unit-check-list"></div>
+      <p class="unit-notice">💡 각 단원이 던전 하나가 됩니다. 모든 던전 클리어 후 최종 보스전이 시작됩니다.</p>
     </div>
 
     <div style="text-align:right; margin-top:6px">
-      <button class="btn btn-primary btn-lg" id="btn-to-game" disabled>
-        다음 단계 →
-      </button>
+      <button class="btn btn-primary btn-lg" id="btn-to-team" disabled>다음 단계 →</button>
     </div>
   </div>
 
-  <!-- ── PHASE 2: 게임 선택 ── -->
-  <div class="phase" id="phase-game">
+  <!-- ── PHASE 2: 팀 설정 ── -->
+  <div class="phase" id="phase-team">
     <div class="card">
-      <div class="card-title">🎮 게임 선택</div>
-      <div class="game-cards">
-        <div class="game-card" data-game="castle" data-mode="ox">
-          <div class="game-card-preview castle-prev">🏰</div>
-          <div class="game-card-info">
-            <div class="game-card-name">🏰 퀴즈 왕국</div>
-            <div class="game-card-desc">O/X 퀴즈 · 판타지 성벽 배경<br>팀이 O와 X 중 하나를 외치는 방식</div>
-          </div>
-        </div>
-        <div class="game-card" data-game="space" data-mode="multiple">
-          <div class="game-card-preview space-prev">🚀</div>
-          <div class="game-card-info">
-            <div class="game-card-name">🚀 우주 탐험대</div>
-            <div class="game-card-desc">4지선다 · 우주 홀로그램 배경<br>번호를 외치거나 손가락으로 표시</div>
-          </div>
-        </div>
-        <div class="game-card" data-game="show" data-mode="multiple">
-          <div class="game-card-preview show-prev">⚡</div>
-          <div class="game-card-info">
-            <div class="game-card-name">⚡ 번개 퀴즈쇼</div>
-            <div class="game-card-desc">속도 퀴즈 · 네온 쇼 배경<br>제한 시간 안에 빨리 답하는 방식</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" id="team-count-card">
-      <div class="card-title">👥 팀 구성 &amp; 문제 수</div>
+      <div class="card-title">🧑‍🤝‍🧑 팀 이름 설정</div>
       <div id="team-fields" class="team-row"></div>
-      <div class="count-row">
-        <span class="count-label">문제 수</span>
-        <input class="count-input" type="number" id="q-count" value="5" min="3" max="15">
-        <span class="count-label">개</span>
-      </div>
+      <p style="font-size:.78rem;color:#64748B;margin-top:12px">💡 팀 이름을 원하는 대로 바꿀 수 있어요.</p>
     </div>
 
-    <div style="display:flex; gap:10px; justify-content:space-between; margin-top:6px">
-      <button class="btn btn-outline" id="btn-back-setup">← 커리큘럼 다시 선택</button>
-      <button class="btn btn-primary btn-lg" id="btn-generate">
-        🤖 AI 문제 생성
-      </button>
+    <div id="setup-summary" class="card" style="background:linear-gradient(135deg,#1E1B4B,#2E1065);color:#E0E7FF">
+      <div style="font-size:.8rem;opacity:.6;margin-bottom:8px">캠페인 구성 미리보기</div>
+      <div id="summary-text" style="font-size:.9rem;line-height:1.8"></div>
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:space-between">
+      <button class="btn btn-outline" id="btn-back-setup">← 단원 다시 선택</button>
+      <button class="btn btn-primary btn-lg" id="btn-start-generate">⚔️ 캠페인 생성 시작</button>
     </div>
   </div>
 
@@ -109,50 +84,83 @@
   <div class="phase" id="phase-loading">
     <div class="card loading-card">
       <div class="spinner"></div>
-      <strong id="loading-subject-name"></strong>
-      <p>AI가 맞춤형 문제를 생성하고 있어요…</p>
+      <strong id="loading-title" style="font-size:1.1rem;display:block;margin-bottom:8px"></strong>
+      <p style="color:#64748B;font-size:.9rem">AI가 던전 문제를 생성 중입니다…</p>
+      <div class="loading-progress-bar-wrap">
+        <div class="loading-progress-fill" id="loading-fill" style="width:0%"></div>
+      </div>
+      <div class="loading-status" id="loading-status"></div>
     </div>
   </div>
 
-  <!-- ── PHASE 4: 컨트롤 패널 ── -->
+  <!-- ── PHASE 4: RPG 컨트롤 패널 ── -->
   <div class="phase" id="phase-ctrl">
 
-    <div class="status-banner">
-      <span id="status-game-icon" style="font-size:1.5rem"></span>
-      <div class="status-meta">
-        <strong id="status-curriculum"></strong><br>
-        <span id="status-game-name"></span>
+    <!-- Campaign header -->
+    <div class="campaign-bar">
+      <div class="campaign-bar-icon" id="ctrl-phase-icon">⚔️</div>
+      <div class="campaign-bar-info">
+        <div class="campaign-bar-title" id="ctrl-title">캠페인 제목</div>
+        <div class="campaign-bar-sub" id="ctrl-sub">단원 정보</div>
       </div>
-      <div class="progress-badge" id="status-progress">0 / 0</div>
+      <div class="campaign-bar-phase" id="ctrl-phase-badge">대기</div>
     </div>
 
-    <div class="ctrl-layout">
-      <!-- Left: Question preview -->
+    <!-- Unit progress bar -->
+    <div class="unit-progress-row" id="unit-progress-row"></div>
+
+    <div class="rpg-ctrl-layout">
+      <!-- Left: Question + controls -->
       <div>
         <div class="q-preview" id="q-preview">
-          <div class="q-preview-num" id="q-preview-num">문제 —</div>
-          <div class="q-preview-text" id="q-preview-text">게임을 시작하면 문제가 여기에 표시됩니다.</div>
+          <div class="q-preview-num" id="q-preview-num">게임 준비</div>
+          <div class="q-preview-text" id="q-preview-text">아래 버튼을 눌러 캠페인을 시작하세요.</div>
           <div id="q-preview-opts"></div>
           <div class="explain-box hidden" id="q-explain"></div>
         </div>
 
-        <div class="ctrl-btns" id="ctrl-btns">
-          <button class="btn btn-outline" id="btn-prev" disabled>◀ 이전</button>
-          <button class="btn btn-primary" id="btn-show">▶ 문제 표시</button>
-          <button class="btn btn-warn" id="btn-reveal" disabled>💡 정답 공개</button>
-          <button class="btn btn-success" id="btn-next" disabled>다음 ▶</button>
-          <button class="btn btn-danger" id="btn-finish" style="margin-left:auto">🏁 게임 종료</button>
+        <!-- Phase: idle / world_map -->
+        <div id="ctrl-idle" class="ctrl-btns">
+          <button class="btn btn-primary btn-lg" id="btn-start-campaign">🗺️ 캠페인 시작</button>
+          <button class="btn btn-outline" id="btn-open-projector-idle">🖥️ 프로젝터 열기</button>
+        </div>
+
+        <!-- Phase: battle / boss_battle / final_boss -->
+        <div id="ctrl-battle" class="hidden">
+          <div class="ctrl-btns">
+            <button class="btn btn-primary" id="btn-reveal">💡 정답 공개</button>
+            <button class="btn btn-outline" id="btn-next-q" disabled>다음 문제 ▶</button>
+          </div>
+          <!-- Team correct buttons (shown after reveal) -->
+          <div class="correct-team-btns hidden" id="correct-team-btns">
+            <span style="font-size:.8rem;font-weight:700;color:#64748B;align-self:center">정답 팀 선택:</span>
+            <!-- populated by JS -->
+            <button class="all-wrong-btn" id="btn-all-wrong">❌ 모두 틀림</button>
+          </div>
+        </div>
+
+        <!-- Phase: checkpoint -->
+        <div id="ctrl-checkpoint" class="ctrl-btns hidden">
+          <button class="btn btn-success btn-lg" id="btn-next-dungeon">다음 던전으로 ▶</button>
+        </div>
+
+        <!-- Phase: final victory prompt -->
+        <div id="ctrl-victory-prompt" class="ctrl-btns hidden">
+          <button class="btn btn-primary btn-lg" id="btn-show-victory">🏆 결과 발표!</button>
         </div>
       </div>
 
       <!-- Right: Score panel -->
       <div class="score-panel">
-        <div class="score-panel-hd">팀 점수</div>
+        <div class="score-panel-hd">팀 현황</div>
         <div id="score-list"></div>
 
-        <button class="proj-btn" id="btn-projector">🖥️ 프로젝터 화면 열기</button>
-        <div style="margin-top:8px; font-size:.73rem; color:#94A3B8; text-align:center; line-height:1.4">
-          같은 기기에서 새 창으로 열립니다.<br>학생들이 볼 화면을 별도 모니터/프로젝터로 이동하세요.
+        <div class="skill-panel-hd">⚡ 스킬</div>
+        <div id="skill-btns"></div>
+
+        <button class="proj-btn" id="btn-open-projector">🖥️ 프로젝터 화면 열기</button>
+        <div style="margin-top:6px;font-size:.7rem;color:#94A3B8;text-align:center;line-height:1.4">
+          같은 기기 새 창으로 열립니다.<br>프로젝터/외부 모니터로 이동하세요.
         </div>
       </div>
     </div>
@@ -164,6 +172,7 @@
 
 <script src="assets/js/curriculum.js"></script>
 <script src="assets/js/state.js"></script>
+<script src="assets/js/rpg.js"></script>
 <script src="assets/js/index.js"></script>
 </body>
 </html>
