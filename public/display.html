@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>퀴즈 화면 — 프로젝터</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/games.css">
+</head>
+<body class="display-body" id="display-body">
+
+  <!-- ── Castle Game ── -->
+  <div id="g-castle" class="hidden">
+    <canvas id="castle-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+    <div class="castle-wall"></div>
+    <div class="castle-stage">
+      <div class="castle-crown">👑</div>
+      <div class="castle-q-card">
+        <div class="castle-q-num" id="castle-q-num">문제 준비 중…</div>
+        <div class="castle-q-text" id="castle-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
+      </div>
+      <div class="castle-ox-wrap" id="castle-ox">
+        <div class="castle-ox-btn O">O</div>
+        <div style="font-size:2.5rem; color:rgba(212,175,55,.4);">VS</div>
+        <div class="castle-ox-btn X">X</div>
+      </div>
+      <div class="castle-explain hidden" id="castle-explain"></div>
+    </div>
+    <!-- Castle score row -->
+    <div id="castle-scores" style="position:absolute;top:18px;right:24px;display:flex;gap:10px;z-index:20"></div>
+  </div>
+
+  <!-- ── Space Game ── -->
+  <div id="g-space" class="hidden">
+    <canvas id="space-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+    <div class="space-nebula"></div>
+    <div class="space-stage">
+      <div class="space-progress-track" style="max-width:860px;width:100%">
+        <div class="space-progress-fill" id="space-fill" style="width:0%"></div>
+        <div class="space-ship" id="space-ship" style="left:0%">🚀</div>
+        <div class="space-planet">🪐</div>
+      </div>
+      <div class="space-q-card">
+        <div class="space-q-num" id="space-q-num">준비 중…</div>
+        <div class="space-q-text" id="space-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
+      </div>
+      <div class="space-opts" id="space-opts"></div>
+      <div class="space-explain hidden" id="space-explain"></div>
+    </div>
+    <div id="space-scores" style="position:absolute;top:18px;right:24px;display:flex;gap:10px;z-index:20"></div>
+  </div>
+
+  <!-- ── Show Game ── -->
+  <div id="g-show" class="hidden">
+    <div class="show-grid"></div>
+    <div class="show-scanlines"></div>
+    <div class="show-stage">
+      <div class="show-header">
+        <div class="show-title">⚡ 번개 퀴즈쇼 ⚡</div>
+        <div class="show-timer-wrap" id="show-timer-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="timer-bg" cx="40" cy="40" r="35"/>
+            <circle class="timer-ring" id="timer-ring" cx="40" cy="40" r="35"/>
+          </svg>
+          <div class="timer-num" id="timer-num">—</div>
+        </div>
+      </div>
+      <div class="show-q-card">
+        <div class="show-q-num" id="show-q-num">준비 중…</div>
+        <div class="show-q-text" id="show-q-text">선생님이 게임을 시작하면 문제가 나타납니다.</div>
+      </div>
+      <div class="space-opts" id="show-opts" style="max-width:900px;width:100%"></div>
+      <div class="space-explain hidden" id="show-explain" style="max-width:900px;width:100%;color:#FFF8E1;border-color:rgba(255,220,0,.4);background:rgba(255,220,0,.08)"></div>
+      <div class="show-scores" id="show-scores"></div>
+    </div>
+    <div class="show-lightning" id="show-lightning"></div>
+  </div>
+
+  <!-- ── Waiting Overlay ── -->
+  <div class="waiting-screen" id="waiting-screen">
+    <div class="waiting-icon">🎮</div>
+    <div class="waiting-text">초등 교실 퀴즈</div>
+    <div class="waiting-sub">선생님이 게임을 시작할 때까지 기다려주세요</div>
+  </div>
+
+  <!-- ── Finish Podium ── -->
+  <div class="finish-screen" id="finish-screen">
+    <div class="finish-title">🎉 게임 종료! 🎉</div>
+    <div class="podium-row" id="podium-row"></div>
+  </div>
+
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/display.js"></script>
+</body>
+</html>
