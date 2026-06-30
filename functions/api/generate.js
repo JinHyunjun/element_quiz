@@ -30,12 +30,13 @@ function buildPrompt({ grade, subject, unit, units, mode, count }) {
     .replace(/{count}/g, String(count || 5));
 }
 
-function cleanJson(text) {
-  return text
-    .replace(/^```json\s*/im, '')
-    .replace(/^```\s*/im, '')
-    .replace(/```\s*$/im, '')
-    .trim();
+function extractJson(text) {
+  if (!text) return text;
+  let s = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  const start = s.indexOf('[');
+  const end = s.lastIndexOf(']');
+  if (start !== -1 && end > start) return s.slice(start, end + 1);
+  return s;
 }
 
 export async function onRequestPost(context) {
@@ -80,7 +81,11 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.75, maxOutputTokens: 2048 },
+          generationConfig: {
+            temperature: 0.75,
+            maxOutputTokens: 2048,
+            responseMimeType: 'application/json',
+          },
         }),
       }
     );
@@ -96,12 +101,12 @@ export async function onRequestPost(context) {
     const data = await geminiRes.json();
     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
-      return new Response(JSON.stringify({ error: 'Gemini 빈 응답' }), { status: 502, headers: CORS });
+      return new Response(JSON.stringify({ error: 'Gemini 빈 응답', data }), { status: 502, headers: CORS });
     }
 
     let questions;
     try {
-      questions = JSON.parse(cleanJson(rawText));
+      questions = JSON.parse(extractJson(rawText));
     } catch {
       return new Response(
         JSON.stringify({ error: 'AI 응답 파싱 실패', raw: rawText }),
