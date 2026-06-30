@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📺 프로젝터 화면</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0F172A;
+      color: #F8FAFC;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header bar ── */
+    .top-bar {
+      background: #1E293B;
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 2px solid #334155;
+      flex-shrink: 0;
+    }
+    .top-bar .meta { font-size: 0.9rem; color: #94A3B8; }
+    .top-bar .meta strong { color: #F8FAFC; }
+    .top-bar .q-counter {
+      margin-left: auto;
+      background: #4F46E5;
+      color: #fff;
+      border-radius: 50px;
+      padding: 4px 18px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* ── Main area ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+    }
+
+    /* ── Waiting screen ── */
+    .waiting-screen {
+      text-align: center;
+    }
+    .waiting-screen .big-emoji { font-size: 6rem; animation: bounce 1s infinite; }
+    .waiting-screen h2 { font-size: 2.5rem; font-weight: 900; margin-top: 24px; color: #F8FAFC; }
+    .waiting-screen p { font-size: 1.1rem; color: #94A3B8; margin-top: 12px; }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+
+    /* ── Question ── */
+    .question-area { width: 100%; max-width: 900px; text-align: center; }
+    .q-label {
+      display: inline-block;
+      background: #4F46E5;
+      color: #fff;
+      border-radius: 50px;
+      padding: 6px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .q-text {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.4;
+      color: #F8FAFC;
+      margin-bottom: 36px;
+      word-break: keep-all;
+    }
+
+    /* ── OX ── */
+    .ox-area {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+    }
+    .ox-circle {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; font-weight: 900;
+      transition: all 0.3s;
+    }
+    .ox-circle.O { background: #1D4ED8; color: #BFDBFE; }
+    .ox-circle.X { background: #B91C1C; color: #FEE2E2; }
+    .ox-circle.dim { opacity: 0.25; }
+    .ox-circle.correct {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 12px rgba(251,191,36,0.4), 0 0 60px rgba(251,191,36,0.3);
+    }
+
+    /* ── Multiple choice ── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .opt-box {
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    .opt-box.c0 { background: #991B1B; color: #FEE2E2; }
+    .opt-box.c1 { background: #1E40AF; color: #DBEAFE; }
+    .opt-box.c2 { background: #92400E; color: #FEF9C3; }
+    .opt-box.c3 { background: #065F46; color: #D1FAE5; }
+    .opt-box.dim { opacity: 0.2; }
+    .opt-box.correct {
+      transform: scale(1.04);
+      box-shadow: 0 0 0 6px #FBBF24, 0 0 40px rgba(251,191,36,0.4);
+    }
+    .opt-number {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    /* ── Explanation ── */
+    .explanation {
+      margin-top: 24px;
+      background: #FFFBEB;
+      color: #78350F;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      max-width: 900px;
+      width: 100%;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Finish screen ── */
+    .finish-screen { text-align: center; animation: fadeIn 0.5s; }
+    .finish-screen h2 { font-size: 3rem; font-weight: 900; margin-bottom: 32px; }
+    .podium {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .podium-item {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .podium-bar {
+      width: 120px;
+      border-radius: 12px 12px 0 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 900; color: #fff;
+    }
+    .podium-name { font-size: 0.95rem; font-weight: 700; color: #CBD5E1; }
+    .podium-score { font-size: 1.1rem; font-weight: 900; color: #FBBF24; }
+
+    /* ── Score footer ── */
+    .score-footer {
+      background: #1E293B;
+      border-top: 2px solid #334155;
+      padding: 12px 32px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .score-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: #0F172A; border-radius: 50px;
+      padding: 6px 18px;
+    }
+    .score-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .score-team-name { font-size: 0.85rem; font-weight: 600; color: #CBD5E1; }
+    .score-num { font-size: 1.1rem; font-weight: 900; color: #FBBF24; margin-left: 6px; }
+
+    /* ── Confetti ── */
+    .confetti-wrap {
+      position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 100;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 10px; height: 18px;
+      border-radius: 3px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span style="font-size:1.4rem">🎯</span>
+  <span class="meta" id="top-meta">로딩 중...</span>
+  <span class="q-counter" id="q-counter"></span>
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="score-footer" id="score-footer"></div>
+
+<div class="confetti-wrap" id="confetti-wrap"></div>
+
+<script>
+  const TEAM_COLORS = ["#EF4444","#3B82F6","#F59E0B","#10B981"];
+  const params = new URLSearchParams(location.search);
+  const sessionId = params.get("session");
+  let prevState = null;
+
+  async function fetchState() {
+    if (!sessionId) return null;
+    const res = await fetch(`/api/game/session/${sessionId}`);
+    return res.ok ? res.json() : null;
+  }
+
+  function renderScoreFooter(teams) {
+    const footer = document.getElementById("score-footer");
+    footer.innerHTML = teams.map((t, i) => `
+      <div class="score-chip">
+        <span class="score-dot" style="background:${TEAM_COLORS[i]}"></span>
+        <span class="score-team-name">${t.name}</span>
+        <span class="score-num">${t.score}</span>
+      </div>`).join("");
+  }
+
+  function renderWaiting(state) {
+    document.getElementById("main").innerHTML = `
+      <div class="waiting-screen">
+        <div class="big-emoji">📚</div>
+        <h2>준비 중이에요!</h2>
+        <p>${state.grade}학년 ${state.subject} · ${state.unit}</p>
+      </div>`;
+    document.getElementById("q-counter").textContent = "";
+  }
+
+  function renderQuestion(state) {
+    const q = state.questions[state.current_index];
+    const total = state.questions.length;
+    document.getElementById("q-counter").textContent = `${state.current_index + 1} / ${total}`;
+    document.getElementById("top-meta").innerHTML =
+      `<strong>${state.grade}학년</strong> ${state.subject} · ${state.unit}`;
+
+    let html = `<div class="question-area">
+      <div class="q-label">문제 ${state.current_index + 1}</div>
+      <div class="q-text">${q.question}</div>`;
+
+    if (state.mode === "ox") {
+      const revealed = state.revealed;
+      const ansO = revealed && q.answer === true;
+      const ansX = revealed && q.answer === false;
+      html += `<div class="ox-area">
+        <div class="ox-circle O ${revealed && !ansO ? "dim" : ""} ${ansO ? "correct" : ""}">O</div>
+        <div class="ox-circle X ${revealed && !ansX ? "dim" : ""} ${ansX ? "correct" : ""}">X</div>
+      </div>`;
+    } else {
+      const labels = ["①","②","③","④"];
+      html += `<div class="options-grid">`;
+      (q.options || []).forEach((opt, i) => {
+        const revealed = state.revealed;
+        const isCorrect = revealed && i === q.answer;
+        const isDim = revealed && i !== q.answer;
+        html += `<div class="opt-box c${i} ${isDim ? "dim" : ""} ${isCorrect ? "correct" : ""}">
+          <span class="opt-number">${labels[i]}</span>
+          <span>${opt}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (state.revealed && q.explanation) {
+      html += `<div class="explanation">💬 ${q.explanation}</div>`;
+    }
+
+    html += `</div>`;
+    document.getElementById("main").innerHTML = html;
+
+    if (state.revealed) launchConfetti();
+  }
+
+  function renderFinish(state) {
+    document.getElementById("q-counter").textContent = "완료!";
+    const sorted = [...state.teams].map((t,i) => ({...t, color: TEAM_COLORS[i]}))
+      .sort((a,b) => b.score - a.score);
+
+    const heights = [180, 130, 100, 80];
+    const medals = ["🥇","🥈","🥉","🏅"];
+
+    let podiumHtml = sorted.map((t, rank) => `
+      <div class="podium-item">
+        <div style="font-size:2rem">${medals[rank]}</div>
+        <div class="podium-bar" style="background:${t.color};height:${heights[rank]}px">
+          ${t.score}
+        </div>
+        <div class="podium-name">${t.name}</div>
+      </div>`).join("");
+
+    document.getElementById("main").innerHTML = `
+      <div class="finish-screen">
+        <h2>🎉 ${sorted[0].name} 우승! 🎉</h2>
+        <div class="podium">${podiumHtml}</div>
+      </div>`;
+
+    launchConfetti(200);
+  }
+
+  function launchConfetti(count = 60) {
+    const wrap = document.getElementById("confetti-wrap");
+    wrap.innerHTML = "";
+    const colors = ["#FBBF24","#34D399","#60A5FA","#F87171","#A78BFA","#FB923C"];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("div");
+      el.className = "confetti-piece";
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+      el.style.animationDelay = Math.random() * 1.5 + "s";
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      wrap.appendChild(el);
+    }
+    setTimeout(() => { wrap.innerHTML = ""; }, 4000);
+  }
+
+  async function poll() {
+    const state = await fetchState();
+    if (!state) return;
+
+    renderScoreFooter(state.teams);
+
+    const stateKey = `${state.status}-${state.current_index}-${state.revealed}`;
+    const prevKey = prevState ? `${prevState.status}-${prevState.current_index}-${prevState.revealed}` : null;
+    if (stateKey === prevKey) return;
+    prevState = state;
+
+    if (state.status === "waiting") {
+      renderWaiting(state);
+    } else if (state.status === "finished") {
+      renderFinish(state);
+    } else {
+      renderQuestion(state);
+    }
+  }
+
+  // Init
+  document.getElementById("top-meta").textContent = sessionId ? "게임 로딩 중..." : "세션 ID가 없습니다";
+  setInterval(poll, 600);
+  poll();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>초등 교실 퀴즈 🎮</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <span style="font-size:1.6rem">🎯</span>
+  <h1>초등 교실 퀴즈</h1>
+  <span class="sub">2022 개정 교육과정 기반 · 선생님 전용</span>
+</header>
+
+<!-- ───────────── SETUP PHASE ───────────── -->
+<div id="phase-setup" class="phase active">
+  <div class="container">
+
+    <!-- STEP 1: 학년 -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">1</span> 학년을 선택하세요</div>
+      <div class="grade-grid" id="grade-grid">
+        <button class="grade-btn" data-grade="1">1학년<small>통합교과</small></button>
+        <button class="grade-btn" data-grade="2">2학년<small>통합교과</small></button>
+        <button class="grade-btn" data-grade="3">3학년<small>영어 시작</small></button>
+        <button class="grade-btn" data-grade="4">4학년</button>
+        <button class="grade-btn" data-grade="5">5학년<small>실과 추가</small></button>
+        <button class="grade-btn" data-grade="6">6학년</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: 학기 -->
+    <div class="card" id="step-semester" style="display:none">
+      <div class="card-title"><span class="step-badge">2</span> 학기를 선택하세요</div>
+      <div class="semester-grid">
+        <button class="sem-btn" data-sem="1">1학기</button>
+        <button class="sem-btn" data-sem="2">2학기</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 과목 -->
+    <div class="card" id="step-subject" style="display:none">
+      <div class="card-title"><span class="step-badge">3</span> 과목을 선택하세요</div>
+      <div class="subject-grid" id="subject-grid"></div>
+    </div>
+
+    <!-- STEP 4: 단원 -->
+    <div class="card" id="step-unit" style="display:none">
+      <div class="card-title"><span class="step-badge">4</span> 단원을 선택하세요</div>
+      <div class="unit-list" id="unit-list"></div>
+    </div>
+
+    <!-- STEP 5: 게임 설정 -->
+    <div class="card" id="step-game-config" style="display:none">
+      <div class="card-title"><span class="step-badge">5</span> 게임 설정</div>
+
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:16px;font-weight:600">문제 유형</p>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="ox">
+          <div class="mode-icon">⭕❌</div>
+          <div class="mode-name">OX 퀴즈</div>
+          <div class="mode-desc">맞으면 O, 틀리면 X<br>몸으로 표현하거나 손들기</div>
+        </button>
+        <button class="mode-btn" data-mode="multiple">
+          <div class="mode-icon">🔢</div>
+          <div class="mode-name">사지선다</div>
+          <div class="mode-desc">① ② ③ ④ 중 정답 고르기<br>모둠 대결에 추천</div>
+        </button>
+      </div>
+
+      <div class="count-row">
+        <span class="count-label">문제 수</span>
+        <input class="count-input" type="number" id="q-count" value="5" min="1" max="15">
+        <span class="count-label">개</span>
+      </div>
+
+      <p style="font-size:0.88rem;color:var(--muted);margin:20px 0 12px;font-weight:600">모둠 이름 설정</p>
+      <div class="team-config" id="team-config">
+        <div class="team-input-wrap">
+          <span class="team-color-dot" style="background:#EF4444"></span>
+          <input class="team-name-input" type="text" value="모둠 1" id="team0">
+        </div>
+        <div class="team-input-wrap">
+          <span class="team-color-dot" style="background:#3B82F6"></span>
+          <input class="team-name-input" type="text" value="모둠 2" id="team1">
+        </div>
+        <div class="team-input-wrap">
+          <span class="team-color-dot" style="background:#F59E0B"></span>
+          <input class="team-name-input" type="text" value="모둠 3" id="team2">
+        </div>
+        <div class="team-input-wrap">
+          <span class="team-color-dot" style="background:#10B981"></span>
+          <input class="team-name-input" type="text" value="모둠 4" id="team3">
+        </div>
+      </div>
+
+      <div style="margin-top:28px;display:flex;gap:12px;justify-content:flex-end">
+        <button class="btn btn-primary btn-lg" id="btn-generate">
+          ✨ AI로 문제 생성하기
+        </button>
+      </div>
+    </div>
+
+    <!-- 생성 중 -->
+    <div class="card" id="step-loading" style="display:none">
+      <div class="spinner"></div>
+      <p class="loading-msg">Gemini AI가 <strong id="loading-subject"></strong> 문제를 만들고 있어요...</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ───────────── GAME PHASE ───────────── -->
+<div id="phase-game" class="phase">
+  <div class="container">
+
+    <div class="status-bar">
+      <div class="status-info" id="game-meta"></div>
+      <div class="progress-pill" id="progress-pill"></div>
+      <button class="btn btn-outline" onclick="resetToSetup()" style="margin-left:12px;padding:8px 16px;font-size:0.85rem">↩ 처음으로</button>
+    </div>
+
+    <div class="game-layout">
+      <!-- 왼쪽: 문제 영역 -->
+      <div>
+        <div class="question-card" id="question-card">
+          <div class="q-meta">게임을 시작하세요</div>
+          <div class="q-text" style="color:var(--muted);font-size:1rem">아래 버튼을 눌러 첫 문제를 시작하세요.</div>
+        </div>
+
+        <div class="game-controls" style="margin-top:16px">
+          <button class="btn btn-success btn-lg" id="btn-start" onclick="startGame()">▶ 게임 시작</button>
+          <button class="btn btn-primary" id="btn-reveal" onclick="revealAnswer()" style="display:none">💡 정답 공개</button>
+          <button class="btn btn-outline" id="btn-next" onclick="nextQ()" style="display:none">다음 문제 →</button>
+          <button class="btn btn-outline" id="btn-prev" onclick="prevQ()" style="display:none">← 이전</button>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 점수판 + 프로젝터 -->
+      <div>
+        <div class="score-panel">
+          <div class="score-panel-title">🏆 점수판</div>
+          <div id="score-list"></div>
+          <button class="projector-btn" onclick="openProjector()">
+            🖥️ 프로젝터 화면 열기
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/assets/js/app.js"></script>
+</body>
+</html>
