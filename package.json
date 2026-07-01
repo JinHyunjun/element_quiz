@@ -1,12 +1,19 @@
 {
   "name": "element-quiz",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "type": "module",
+  "description": "출석, 공정한 발표 기회, 참여 퀴즈와 리포트를 연결한 초등 교실 참여 도구",
   "scripts": {
-    "dev": "wrangler pages dev public --compatibility-date=2024-09-23",
+    "dev": "wrangler pages dev public",
+    "test": "node --test",
+    "check": "node scripts/check.mjs && node --test",
     "deploy": "wrangler pages deploy public --project-name=element-quiz"
   },
   "devDependencies": {
-    "wrangler": "^3.99.0"
+    "wrangler": "^4.106.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

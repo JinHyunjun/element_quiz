@@ -1,101 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>퀴즈 RPG — 프로젝터</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102f2c">
+  <title>모두의 탐험대 | 학생 화면</title>
   <link rel="stylesheet" href="assets/css/games.css">
 </head>
-<body class="display-body">
+<body>
+  <main class="display-stage">
+    <section class="display-scene active" id="display-idle">
+      <div class="idle-symbol" aria-hidden="true">✦</div>
+      <p>모두의 탐험대</p>
+      <h1>오늘의 수업을<br>준비하고 있어요.</h1>
+      <span>선생님 화면에서 수업을 시작해 주세요.</span>
+    </section>
 
-<!-- ── Background canvas ── -->
-<canvas id="rpg-canvas"></canvas>
-<div class="scanlines"></div>
+    <section class="display-scene" id="display-question">
+      <header class="display-header">
+        <div><span class="display-brand">모두의 탐험대</span><strong id="display-class-name">우리 반 탐험 수업</strong></div>
+        <div class="display-progress"><span id="display-meta">수업 주제</span><strong id="display-question-number">1 / 6</strong></div>
+      </header>
 
-<!-- ════════════════ SCENE: IDLE ════════════════ -->
-<div class="scene active" id="scene-idle">
-  <div class="idle-logo">⚔️</div>
-  <div class="idle-title">초등 교실 퀴즈 RPG</div>
-  <div class="idle-sub">선생님이 캠페인을 시작할 때까지 기다려주세요</div>
-</div>
-
-<!-- ════════════════ SCENE: WORLD MAP ════════════════ -->
-<div class="scene" id="scene-map">
-  <div class="map-title" id="map-title">🗺️ 캠페인 지도</div>
-  <div class="map-path" id="map-path"></div>
-  <div class="map-teams" id="map-teams"></div>
-</div>
-
-<!-- ════════════════ SCENE: BATTLE (normal + boss + final) ════════════════ -->
-<div class="scene" id="scene-battle">
-  <div class="battle-layout">
-    <!-- Left: Team panels -->
-    <div class="battle-teams" id="battle-teams">
-      <div class="battle-phase-tag" id="battle-phase-tag">전투 중</div>
-    </div>
-
-    <!-- Center: Monster + Question -->
-    <div class="battle-center" id="battle-center">
-      <!-- Stage info top -->
-      <div style="text-align:center;font-size:.72rem;letter-spacing:.18em;color:rgba(255,255,255,.35);text-transform:uppercase" id="battle-stage-tag">던전 1</div>
-
-      <!-- Monster -->
-      <div class="monster-area">
-        <span class="monster-emoji" id="monster-emoji">🐉</span>
-        <div class="monster-name" id="monster-name" style="color:#F87171">드래곤</div>
-        <div class="monster-hp-wrap">
-          <div class="monster-hp-bg">
-            <div class="monster-hp-fill" id="monster-hp-fill" style="width:100%"></div>
-          </div>
-          <div class="monster-hp-text" id="monster-hp-text">100/100</div>
+      <div class="display-content">
+        <div class="display-question-card">
+          <div class="display-question-top"><span id="display-kind">생각 열기</span><div class="display-timer" id="display-timer">생각 중</div></div>
+          <h1 id="display-question-text">문제를 준비하고 있어요.</h1>
+          <div class="display-options" id="display-options"></div>
+          <div class="display-explanation hidden" id="display-explanation"></div>
         </div>
+
+        <aside class="display-aside">
+          <div class="display-picker">
+            <span>오늘의 발표자</span>
+            <strong id="display-picked">잠시 후 만나요</strong>
+            <small>생각할 시간을 충분히 줄게요.</small>
+          </div>
+          <div class="display-team-list" id="display-team-list"></div>
+          <div class="display-coverage">
+            <span>한 번 이상 참여한 친구</span><strong id="display-coverage-copy">0 / 0명</strong>
+            <div><i id="display-coverage-bar"></i></div>
+          </div>
+        </aside>
       </div>
+    </section>
 
-      <!-- Question card -->
-      <div class="rpg-q-card" id="rpg-q-card">
-        <div class="rpg-q-num" id="rpg-q-num">문제 1/4</div>
-        <div class="rpg-q-text" id="rpg-q-text">문제 내용이 여기에 표시됩니다.</div>
-        <div class="rpg-opts" id="rpg-opts"></div>
-        <div class="rpg-explain hidden" id="rpg-explain"></div>
-      </div>
+    <section class="display-scene" id="display-summary">
+      <div class="summary-burst" aria-hidden="true">✦</div>
+      <p>오늘의 탐험 완료</p>
+      <h1 id="display-summary-title">모두가 한 걸음 내디뎠어요!</h1>
+      <div class="display-summary-stats" id="display-summary-stats"></div>
+      <span>정답뿐 아니라 용기 내어 도전한 모든 순간이 별이 되었어요.</span>
+    </section>
+  </main>
 
-      <!-- Floating numbers layer -->
-      <div id="floaters" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
-    </div>
-
-    <!-- Right: Skills + Unit info -->
-    <div class="battle-sidebar">
-      <div class="sidebar-stage">
-        단원<strong id="sidebar-unit-name">—</strong>
-      </div>
-      <div style="margin-top:auto">
-        <div class="skills-section-title">스킬</div>
-        <div id="display-skills"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════ SCENE: CHECKPOINT ════════════════ -->
-<div class="scene" id="scene-checkpoint">
-  <div class="camp-fire">🔥</div>
-  <div class="checkpoint-title" id="ckpt-title">체크포인트 🏕️</div>
-  <div class="checkpoint-unit" id="ckpt-unit"></div>
-  <div class="checkpoint-teams" id="ckpt-teams"></div>
-  <div class="checkpoint-next">▷ 선생님이 다음 단계를 진행합니다…</div>
-</div>
-
-<!-- ════════════════ SCENE: VICTORY ════════════════ -->
-<div class="scene" id="scene-victory">
-  <div class="victory-title">🎉 캠페인 클리어! 🎉</div>
-  <div class="podium-row" id="podium-row"></div>
-</div>
-
-<script src="assets/js/state.js"></script>
-<script src="assets/js/rpg.js"></script>
-<script src="assets/js/display.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/display.js"></script>
 </body>
 </html>

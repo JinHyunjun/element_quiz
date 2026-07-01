@@ -1,147 +1,75 @@
-/* ═══════════════════════════════════════
-   RPG — 초등 교실 퀴즈 RPG 데이터 & 상수
-════════════════════════════════════════ */
-const RPG = {
-  // ── Team ──
-  TEAM_MAX_HP: 100,
+/** 퀴즈 경험에 필요한 표시 규칙과 AI 실패 시 사용할 참여 미션입니다. */
+const QuizKit = {
+  typeLabels: { multiple: "골라 보기", ox: "O · X", talk: "함께 말하기" },
+  optionLabels: ["①", "②", "③", "④"],
+  teamNames: ["새싹 팀", "파도 팀", "햇살 팀", "별빛 팀"],
 
-  // ── Monster HP ──
-  REGULAR_HP:    60,
-  BOSS_HP:      100,
-  FINAL_BOSS_HP: 200,
-
-  // ── Rewards & Penalties ──
-  CORRECT_DAMAGE: 20,   // player → monster
-  CORRECT_GOLD:   10,
-  BOSS_DAMAGE:    35,
-  BOSS_GOLD:      25,
-  FINAL_DAMAGE:   40,
-  FINAL_GOLD:     30,
-
-  WRONG_DAMAGE:      15, // monster → team
-  BOSS_WRONG_DAMAGE: 25,
-  FINAL_WRONG_DAMAGE:30,
-
-  CHECKPOINT_HEAL: 25,
-
-  // ── Skill unlock thresholds (total correct) ──
-  SKILL_THRESHOLDS: { shield: 3, hint: 7, double: 12 },
-
-  SKILLS: {
-    shield: { name: '철벽 방어',   emoji: '🛡️', desc: '다음 오답 → 피해 무효' },
-    hint:   { name: '마법의 힌트', emoji: '✨', desc: '오답 선지 1개 제거' },
-    double: { name: '황금 배율',   emoji: '💰', desc: '다음 정답 골드 2배' },
-  },
-
-  // ── Monsters by subject ──
-  MONSTERS: {
-    _default: {
-      pool: [
-        { name: '슬라임',   emoji: '🟢', color: '#4ADE80' },
-        { name: '고블린',   emoji: '👺', color: '#FB923C' },
-        { name: '스켈레톤', emoji: '💀', color: '#CBD5E1' },
-        { name: '오크',     emoji: '👹', color: '#A3E635' },
-        { name: '트롤',     emoji: '🧌', color: '#34D399' },
-      ],
-      boss:  { name: '드래곤',  emoji: '🐉', color: '#F87171' },
-      final: { name: '마왕',   emoji: '😈', color: '#C084FC' },
-    },
-    '국어': {
-      pool: [
-        { name: '글자 슬라임',   emoji: '📝', color: '#60A5FA' },
-        { name: '맞춤법 고블린', emoji: '🖊️', color: '#34D399' },
-        { name: '이야기 오크',   emoji: '📖', color: '#F59E0B' },
-        { name: '시 마법사',     emoji: '🎭', color: '#A78BFA' },
-        { name: '받아쓰기 박쥐', emoji: '🦇', color: '#F472B6' },
-      ],
-      boss:  { name: '문학의 드래곤', emoji: '🐉', color: '#818CF8' },
-      final: { name: '언어의 마왕',   emoji: '📚', color: '#C084FC' },
-    },
-    '수학': {
-      pool: [
-        { name: '숫자 슬라임', emoji: '🔢', color: '#34D399' },
-        { name: '덧셈 고블린', emoji: '➕', color: '#60A5FA' },
-        { name: '곱셈 트롤',   emoji: '✖️', color: '#FB923C' },
-        { name: '도형 마법사', emoji: '📐', color: '#A78BFA' },
-        { name: '분수 오크',   emoji: '🍕', color: '#F59E0B' },
-      ],
-      boss:  { name: '계산의 골렘',  emoji: '⚙️', color: '#94A3B8' },
-      final: { name: '수학의 지배자', emoji: '🔱', color: '#FBBF24' },
-    },
-    '과학': {
-      pool: [
-        { name: '플랑크톤 슬라임', emoji: '🦠', color: '#4ADE80' },
-        { name: '화산 고블린',     emoji: '🌋', color: '#F87171' },
-        { name: '번개 트롤',       emoji: '⚡', color: '#FDE68A' },
-        { name: '얼음 오크',       emoji: '❄️', color: '#BAE6FD' },
-        { name: '독 박쥐',         emoji: '🦇', color: '#A3E635' },
-      ],
-      boss:  { name: '원소의 드래곤',  emoji: '🔬', color: '#22D3EE' },
-      final: { name: '자연의 지배자', emoji: '🌍', color: '#10B981' },
-    },
-    '사회': {
-      pool: [
-        { name: '지도 슬라임',   emoji: '🗺️', color: '#60A5FA' },
-        { name: '역사 유령',     emoji: '👻', color: '#D1D5DB' },
-        { name: '법률 오크',     emoji: '⚖️', color: '#F59E0B' },
-        { name: '경제 고블린',   emoji: '💹', color: '#34D399' },
-        { name: '문화 마법사',   emoji: '🏛️', color: '#C084FC' },
-      ],
-      boss:  { name: '시간의 수호자', emoji: '⏳', color: '#F59E0B' },
-      final: { name: '역사의 제왕',   emoji: '👑', color: '#EF4444' },
-    },
-    '영어': {
-      pool: [
-        { name: 'ABC 슬라임',   emoji: '🔤', color: '#60A5FA' },
-        { name: '단어 고블린',  emoji: '💬', color: '#34D399' },
-        { name: '문법 트롤',    emoji: '📋', color: '#F59E0B' },
-        { name: '발음 박쥐',    emoji: '🦜', color: '#F472B6' },
-        { name: '문장 마법사',  emoji: '✉️', color: '#A78BFA' },
-      ],
-      boss:  { name: '영어의 드래곤',  emoji: '🐲', color: '#3B82F6' },
-      final: { name: 'English Master', emoji: '🌐', color: '#06B6D4' },
-    },
-    '도덕': {
-      pool: [
-        { name: '거짓말 슬라임', emoji: '🤥', color: '#F87171' },
-        { name: '게으름 고블린', emoji: '😴', color: '#94A3B8' },
-        { name: '욕심 오크',     emoji: '😈', color: '#F59E0B' },
-        { name: '두려움 박쥐',   emoji: '😱', color: '#A78BFA' },
-        { name: '불만 마법사',   emoji: '😤', color: '#FB923C' },
-      ],
-      boss:  { name: '혼돈의 드래곤', emoji: '💔', color: '#EF4444' },
-      final: { name: '악의 마왕',     emoji: '☠️', color: '#7C3AED' },
-    },
-  },
-
-  // ── Get monster data ──
-  getMonster(subject, slotIdx, isBoss, isFinalBoss) {
-    const lib = this.MONSTERS[subject] || this.MONSTERS['_default'];
-    if (isFinalBoss) {
-      const d = lib.final || this.MONSTERS['_default'].final;
-      return { ...d, hp: this.FINAL_BOSS_HP, maxHp: this.FINAL_BOSS_HP };
-    }
-    if (isBoss) {
-      const d = lib.boss || this.MONSTERS['_default'].boss;
-      return { ...d, hp: this.BOSS_HP, maxHp: this.BOSS_HP };
-    }
-    const pool = lib.pool || this.MONSTERS['_default'].pool;
-    const d = pool[slotIdx % pool.length];
-    return { ...d, hp: this.REGULAR_HP, maxHp: this.REGULAR_HP };
-  },
-
-  // ── Calc reward when correct ──
-  calcReward(isBoss, isFinalBoss, doubleActive) {
-    let damage = isFinalBoss ? this.FINAL_DAMAGE : (isBoss ? this.BOSS_DAMAGE : this.CORRECT_DAMAGE);
-    let gold   = isFinalBoss ? this.FINAL_GOLD   : (isBoss ? this.BOSS_GOLD   : this.CORRECT_GOLD);
-    if (doubleActive) gold *= 2;
-    return { damage, gold };
-  },
-
-  // ── Calc penalty when wrong ──
-  calcPenalty(isBoss, isFinalBoss, shieldActive) {
-    if (shieldActive) return { damage: 0, blocked: true };
-    const damage = isFinalBoss ? this.FINAL_WRONG_DAMAGE : (isBoss ? this.BOSS_WRONG_DAMAGE : this.WRONG_DAMAGE);
-    return { damage, blocked: false };
-  },
+  fallbackQuestions({ topic, count }) {
+    const safeTopic = topic || "오늘 배운 내용";
+    const templates = [
+      {
+        type: "talk",
+        question: `‘${safeTopic}’에서 가장 기억에 남는 낱말 하나를 짝에게 설명해 보세요.`,
+        answer: "핵심 낱말과 그 뜻을 자신의 말로 설명하면 성공!",
+        explanation: "친구의 설명에서 새롭게 알게 된 점도 한 가지 찾아보세요."
+      },
+      {
+        type: "ox",
+        question: "잘 모르는 부분을 질문하는 것도 수업에 참여하는 방법이다.",
+        answer: true,
+        explanation: "맞아요. 좋은 질문은 모두의 이해를 돕는 소중한 참여예요."
+      },
+      {
+        type: "talk",
+        question: `‘${safeTopic}’을 처음 배우는 친구에게 20초 안에 소개해 보세요.`,
+        answer: "주제와 관련된 핵심 생각이 한 가지 들어가면 성공!",
+        explanation: "짧게 설명할수록 무엇이 핵심인지 더 잘 드러나요."
+      },
+      {
+        type: "multiple",
+        question: "새로운 내용을 오래 기억하는 데 가장 도움이 되는 행동은 무엇일까요?",
+        options: ["그냥 보기", "내 말로 설명하기", "답만 외우기", "모른 척하기"],
+        answer: 1,
+        explanation: "배운 내용을 자신의 말로 설명하면 이해한 부분과 헷갈리는 부분이 보여요."
+      },
+      {
+        type: "talk",
+        question: `‘${safeTopic}’과 우리 생활이 연결되는 예를 팀에서 하나 찾아보세요.`,
+        answer: "주제와 생활을 자연스럽게 연결한 예라면 모두 성공!",
+        explanation: "배운 것을 생활과 연결하면 지식이 더 선명해져요."
+      },
+      {
+        type: "ox",
+        question: "친구와 답이 다를 때는 이유를 물어보며 비교해 볼 수 있다.",
+        answer: true,
+        explanation: "서로 다른 생각의 이유를 듣는 과정에서 더 깊이 배울 수 있어요."
+      },
+      {
+        type: "talk",
+        question: `오늘 ‘${safeTopic}’에서 아직 궁금한 점을 질문으로 만들어 보세요.`,
+        answer: "주제와 관련된 궁금증을 질문 문장으로 말하면 성공!",
+        explanation: "궁금증은 다음 배움을 여는 출발점이에요."
+      },
+      {
+        type: "multiple",
+        question: "팀 친구가 발표할 때 가장 좋은 참여 모습은 무엇일까요?",
+        options: ["끝까지 듣기", "먼저 말하기", "딴짓하기", "답만 재촉하기"],
+        answer: 0,
+        explanation: "잘 듣는 것도 발표만큼 중요한 참여예요."
+      },
+      {
+        type: "talk",
+        question: `‘${safeTopic}’을 그림이나 몸짓 하나로 표현하고 팀이 맞혀 보세요.`,
+        answer: "주제와 연결되는 표현을 하고 팀이 까닭을 말하면 성공!",
+        explanation: "말·그림·몸짓처럼 다양한 방식으로 생각을 표현할 수 있어요."
+      },
+      {
+        type: "talk",
+        question: `오늘 배운 ‘${safeTopic}’을 한 문장으로 정리해 보세요.`,
+        answer: "오늘 배운 핵심 생각이 들어간 문장이면 성공!",
+        explanation: "마지막 한 문장이 오늘의 기억을 단단하게 묶어 줘요."
+      }
+    ];
+    return templates.slice(0, Math.max(1, Math.min(Number(count) || 6, templates.length)));
+  }
 };
