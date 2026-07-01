@@ -1,9 +1,9 @@
 {
   "name": "element-quiz",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "출석, 공정한 발표 기회, 참여 퀴즈와 리포트를 연결한 초등 교실 참여 도구",
+  "description": "교과별 던전, 협동 보스 레이드와 참여 보상을 연결한 초등 교실 MMORPG",
   "scripts": {
     "dev": "wrangler pages dev public",
     "test": "node --test",

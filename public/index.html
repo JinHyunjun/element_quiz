@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#173f3a">
-  <meta name="description" content="출석부터 공정한 발표 기회, 퀴즈, 참여 리포트까지 한 번에 운영하는 초등 교실 참여 도구">
-  <title>모두의 탐험대 | 교실 참여 퀴즈</title>
+  <meta name="theme-color" content="#15243b">
+  <meta name="description" content="학급 전체가 원정대가 되어 던전을 탐험하고 보스를 물리치는 초등 교실 참여형 퀴즈">
+  <title>모두의 원정대 | 협동 수업 RPG</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 바로가기</a>
 
   <header class="topbar">
-    <a class="brand" href="/" aria-label="모두의 탐험대 처음으로">
-      <span class="brand-mark" aria-hidden="true">모</span>
-      <span><strong>모두의 탐험대</strong><small>교실 참여 퀴즈</small></span>
+    <a class="brand" href="/" aria-label="모두의 원정대 처음으로">
+      <span class="brand-mark" aria-hidden="true">⚔</span>
+      <span><strong>모두의 원정대</strong><small>협동 수업 RPG</small></span>
     </a>
     <div class="topbar-actions">
       <span class="privacy-note">학생 정보는 이 브라우저에만 저장돼요</span>
@@ -26,35 +26,37 @@
     <section class="view active" id="view-prep" aria-labelledby="prep-title">
       <div class="hero shell">
         <div class="hero-copy">
-          <p class="eyebrow">오늘도 한 명도 빠짐없이</p>
-          <h1 id="prep-title">발표는 공정하게,<br><em>도전은 가볍게.</em></h1>
-          <p>출석을 확인하고 팀을 만든 뒤, 짧은 퀴즈로 모든 학생에게 한 번 이상의 참여 기회를 주세요.</p>
-          <div class="hero-points" aria-label="서비스 특징">
-            <span>출석과 팀 편성</span><span>공정 발표 추천</span><span>참여 리포트</span>
+          <p class="eyebrow">우리 반 모두가 한 원정대</p>
+          <h1 id="prep-title">배운 지식으로<br><em>던전을 돌파하자.</em></h1>
+          <p>도전하면 공격, 정답이면 강력한 공격! 전원이 참여하면 협동 룬과 보상 아이템을 얻어 마지막 보스를 함께 물리쳐요.</p>
+          <div class="hero-points" aria-label="게임 특징">
+            <span>교과별 던전 시나리오</span><span>협동 보스 레이드</span><span>보상 아이템</span>
           </div>
         </div>
         <div class="hero-visual" aria-hidden="true">
-          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-          <div class="hero-card hero-card-main"><b>오늘의 참여</b><strong>24 / 26명</strong><span>두 명만 더 도전하면 모두 참여!</span></div>
-          <div class="hero-card hero-card-float">✨ 도전도 점수예요</div>
+          <div class="moon"></div>
+          <div class="hero-castle">🏰</div>
+          <div class="hero-party"><span>🧙</span><span>🧝</span><span>🛡️</span><span>🧭</span></div>
+          <div class="hero-card hero-card-main"><b>마왕의 결계</b><strong>240 HP</strong><span>모두의 참여로 결계를 깨뜨리세요</span></div>
+          <div class="hero-card hero-card-float">협동 룬 +1 ✦</div>
         </div>
       </div>
 
       <div class="shell prep-layout">
-        <nav class="step-nav" aria-label="수업 준비 단계">
-          <button class="step-link active" type="button" data-scroll="lesson-card"><span>1</span><b>수업 정보</b><small>학년·교과·주제</small></button>
-          <button class="step-link" type="button" data-scroll="roster-card"><span>2</span><b>출석과 팀</b><small>명단·참석 확인</small></button>
-          <button class="step-link" type="button" data-scroll="quiz-card"><span>3</span><b>참여 퀴즈</b><small>문항 수·운영 원칙</small></button>
+        <nav class="step-nav" aria-label="원정 준비 단계">
+          <button class="step-link active" type="button" data-scroll="lesson-card"><span>1</span><b>원정 의뢰</b><small>학년·교과·주제</small></button>
+          <button class="step-link" type="button" data-scroll="roster-card"><span>2</span><b>길드 편성</b><small>출석·파티 구성</small></button>
+          <button class="step-link" type="button" data-scroll="quiz-card"><span>3</span><b>던전 설정</b><small>시나리오·문항 수</small></button>
         </nav>
 
         <div class="prep-cards">
           <section class="panel prep-card" id="lesson-card" aria-labelledby="lesson-title">
             <div class="section-heading">
               <span class="section-number">01</span>
-              <div><h2 id="lesson-title">오늘 수업을 알려주세요</h2><p>교과서 단원명이 달라도 직접 주제를 적을 수 있어요.</p></div>
+              <div><h2 id="lesson-title">오늘의 원정 의뢰</h2><p>선택한 교과에 맞춰 던전과 보스 이야기가 달라져요.</p></div>
             </div>
             <div class="form-grid">
-              <label class="field field-wide"><span>수업 이름</span><input id="class-name" maxlength="40" value="우리 반 탐험 수업" autocomplete="off"></label>
+              <label class="field field-wide"><span>원정대 이름</span><input id="class-name" maxlength="40" value="우리 반 별빛 원정대" autocomplete="off"></label>
               <label class="field"><span>학년</span><select id="grade-select"><option value="">선택</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option></select></label>
               <label class="field"><span>교과</span><select id="subject-select" disabled><option value="">학년을 먼저 선택하세요</option></select></label>
               <label class="field field-wide"><span>수업 주제</span><select id="topic-select" disabled><option value="">교과를 먼저 선택하세요</option></select></label>
@@ -65,7 +67,7 @@
           <section class="panel prep-card" id="roster-card" aria-labelledby="roster-title">
             <div class="section-heading">
               <span class="section-number">02</span>
-              <div><h2 id="roster-title">누가 함께하나요?</h2><p>한 줄에 한 명씩 붙여 넣고, 오늘 결석한 학생만 눌러주세요.</p></div>
+              <div><h2 id="roster-title">원정대 길드 편성</h2><p>학생 명단을 넣고 오늘 함께 모험할 길드를 구성해요.</p></div>
             </div>
             <div class="roster-input-row">
               <label class="field field-grow"><span>학생 명단</span><textarea id="roster-input" rows="6" placeholder="김하늘&#10;박이든&#10;최다온"></textarea></label>
@@ -74,16 +76,16 @@
                 <button class="text-button" id="load-sample" type="button">예시 명단 넣기</button>
               </div>
             </div>
-            <div class="empty-state" id="roster-empty">명단을 반영하면 여기에서 출석을 확인할 수 있어요.</div>
+            <div class="empty-state" id="roster-empty">명단을 반영하면 출석 확인과 길드 편성을 시작할 수 있어요.</div>
             <div class="hidden" id="attendance-area">
               <div class="attendance-toolbar">
-                <p><strong id="present-count">0명</strong> 참석</p>
-                <button class="text-button" id="present-all" type="button">모두 참석</button>
+                <p><strong id="present-count">0명</strong> 원정 참가</p>
+                <button class="text-button" id="present-all" type="button">모두 참가</button>
               </div>
               <div class="attendance-list" id="attendance-list"></div>
               <div class="team-setting">
-                <label class="field"><span>팀 수</span><select id="team-count"><option value="2">2팀</option><option value="3" selected>3팀</option><option value="4">4팀</option></select></label>
-                <p>참석 학생을 고르게 섞어 배정해요. 수업 중에는 개인 순위를 공개하지 않아요.</p>
+                <label class="field"><span>길드 수</span><select id="team-count"><option value="2">2개 길드</option><option value="3" selected>3개 길드</option><option value="4">4개 길드</option></select></label>
+                <p>참가 학생을 고르게 섞어 배정합니다. 개인 순위 대신 길드와 학급 전체의 협동 성과만 공개해요.</p>
               </div>
             </div>
           </section>
@@ -91,19 +93,24 @@
           <section class="panel prep-card" id="quiz-card" aria-labelledby="quiz-title">
             <div class="section-heading">
               <span class="section-number">03</span>
-              <div><h2 id="quiz-title">짧고 자주 참여하게 만들어요</h2><p>지식 확인과 말하기 미션을 섞어, 정답을 몰라도 도전할 수 있게 구성해요.</p></div>
+              <div><h2 id="quiz-title">오늘의 던전</h2><p>지식 문제와 파티 미션을 통과하며 보스의 결계를 약화시켜요.</p></div>
+            </div>
+            <div class="adventure-preview" id="adventure-preview">
+              <div class="adventure-art" id="adventure-art">🌌</div>
+              <div><span>자동 시나리오</span><h3 id="adventure-name">별빛 지식의 성</h3><p id="adventure-intro">지식의 빛을 훔쳐 간 마왕을 쫓아 네 구역의 던전을 탐험합니다.</p></div>
+              <div class="preview-boss"><small>최종 보스</small><strong id="adventure-boss">망각의 마왕 녹스</strong></div>
             </div>
             <div class="quiz-options">
-              <label class="field"><span>문항 수</span><select id="question-count"><option value="4">4문항 · 약 10분</option><option value="6" selected>6문항 · 약 15분</option><option value="8">8문항 · 약 20분</option><option value="10">10문항 · 약 25분</option></select></label>
-              <div class="principles" aria-label="퀴즈 구성 원칙">
-                <div><span>01</span><b>쉽게 시작</b><small>첫 문제는 누구나 손들 수 있게</small></div>
-                <div><span>02</span><b>설명해 보기</b><small>외우기보다 말로 풀어보기</small></div>
-                <div><span>03</span><b>감점 없음</b><small>오답 대신 도전에 별 하나</small></div>
+              <label class="field"><span>던전 길이</span><select id="question-count"><option value="4">짧은 원정 · 약 10분</option><option value="6" selected>기본 원정 · 약 15분</option><option value="8">긴 원정 · 약 20분</option><option value="10">대원정 · 약 25분</option></select></label>
+              <div class="principles" aria-label="게임 진행 규칙">
+                <div><span>⚔</span><b>도전 공격</b><small>틀려도 도전하면 결계에 피해 6</small></div>
+                <div><span>✦</span><b>협동 룬</b><small>모든 길드가 참여하면 추가 피해</small></div>
+                <div><span>🎁</span><b>보상 획득</b><small>별을 모아 힌트와 시간 아이템 해금</small></div>
               </div>
             </div>
             <div class="launch-row">
-              <div><strong>AI가 문제를 만들지 못해도 수업은 시작할 수 있어요.</strong><small>자동으로 참여 미션 세트로 전환됩니다.</small></div>
-              <button class="button button-primary button-large" id="generate-button" type="button"><span>수업 만들기</span><span aria-hidden="true">→</span></button>
+              <div><strong>AI가 지식 문제를 만들고, 게임 엔진이 던전 이야기와 보상을 연결해요.</strong><small>AI 연결이 어려우면 참여 미션 던전으로 자동 전환됩니다.</small></div>
+              <button class="button button-primary button-large" id="generate-button" type="button"><span>원정 시작하기</span><span aria-hidden="true">→</span></button>
             </div>
             <div class="generation-status hidden" id="generation-status" role="status" aria-live="polite"></div>
           </section>
@@ -114,47 +121,70 @@
     <section class="view" id="view-live" aria-labelledby="live-title">
       <div class="live-shell">
         <div class="live-heading">
-          <div><p class="eyebrow" id="live-meta">수업 진행</p><h1 id="live-title">우리 반 탐험 수업</h1></div>
+          <div><p class="eyebrow" id="live-meta">원정 진행</p><h1 id="live-title">우리 반 별빛 원정대</h1></div>
           <div class="live-stats">
-            <div><small>출석</small><strong id="live-attendance">0 / 0</strong></div>
-            <div><small>참여 학생</small><strong id="live-coverage">0%</strong></div>
-            <div><small>진행</small><strong id="live-progress">1 / 6</strong></div>
+            <div><small>참가</small><strong id="live-attendance">0 / 0</strong></div>
+            <div><small>첫 참여 달성</small><strong id="live-coverage">0%</strong></div>
+            <div><small>협동 룬</small><strong id="live-runes">0개</strong></div>
           </div>
         </div>
+
+        <section class="dungeon-hud" aria-label="던전 진행 상황">
+          <div class="dungeon-story">
+            <div class="world-emblem" id="world-emblem">🌌</div>
+            <div><span id="world-name">별빛 지식의 성</span><strong id="story-beat">첫 번째 관문이 열렸습니다.</strong></div>
+          </div>
+          <div class="dungeon-path" id="dungeon-path"></div>
+          <div class="boss-status">
+            <div><span>최종 보스 결계</span><strong id="boss-name">망각의 마왕 녹스</strong></div>
+            <div class="boss-hp-track"><i id="boss-hp-bar"></i></div>
+            <small id="boss-hp-text">240 / 240 HP</small>
+          </div>
+        </section>
 
         <div class="live-grid">
           <div class="live-main">
             <section class="question-panel" aria-live="polite">
-              <div class="question-topline"><span class="question-kind" id="question-kind">생각 열기</span><span id="question-number">문제 1</span></div>
+              <div class="encounter-header">
+                <div class="encounter-creature" id="encounter-emoji">🦇</div>
+                <div><span id="encounter-stage">제1구역</span><strong id="encounter-name">메아리 박쥐 떼</strong></div>
+                <div class="question-count" id="question-number">임무 1 / 6</div>
+              </div>
+              <div class="question-topline"><span class="question-kind" id="question-kind">골라 보기</span><span id="battle-message">도전하면 보스의 결계가 약해져요</span></div>
               <h2 id="question-text">문제를 준비하고 있어요.</h2>
               <div class="answer-options" id="answer-options"></div>
               <div class="answer-explanation hidden" id="answer-explanation"></div>
+              <div class="battle-floaters" id="battle-floaters" aria-hidden="true"></div>
             </section>
 
             <div class="control-panel">
               <div class="control-group">
-                <span class="control-label">생각 시간</span>
+                <span class="control-label">작전 시간</span>
                 <div class="button-group"><button class="chip-button" type="button" data-timer="30">30초</button><button class="chip-button" type="button" data-timer="60">1분</button><button class="chip-button" id="stop-timer" type="button">멈춤</button><strong class="timer-readout" id="timer-readout">—</strong></div>
               </div>
               <div class="main-controls">
-                <button class="button button-secondary" id="pick-student" type="button">공정 발표자 추천</button>
-                <button class="button button-dark" id="reveal-answer" type="button">정답 보기</button>
-                <button class="button button-primary" id="next-question" type="button" disabled>다음 문제</button>
+                <button class="button button-secondary" id="pick-student" type="button">다음 모험가 추천</button>
+                <button class="button button-dark" id="reveal-answer" type="button">정답 공개</button>
+                <button class="button button-primary" id="next-question" type="button" disabled>다음 구역</button>
               </div>
             </div>
           </div>
 
           <aside class="live-sidebar">
             <section class="picker-card">
-              <div class="sidebar-title"><span>오늘의 발표자</span><small>참여 횟수가 적은 학생 우선</small></div>
-              <div class="picked-student" id="picked-student"><span aria-hidden="true">✦</span><strong>추천 버튼을 눌러주세요</strong><small>부담스러우면 한 번 건너뛰어도 괜찮아요.</small></div>
+              <div class="sidebar-title"><span>선택된 모험가</span><small>참여 횟수가 적은 학생 우선</small></div>
+              <div class="picked-student" id="picked-student"><span aria-hidden="true">✦</span><strong>추천 버튼을 눌러주세요</strong><small>한 번 건너뛰어도 괜찮아요.</small></div>
             </section>
             <section class="teams-card">
-              <div class="sidebar-title"><span>팀 참여 별</span><small>도전 +1 · 정답 +2</small></div>
+              <div class="sidebar-title"><span>길드 공격</span><small>도전 6 · 정답 14 피해</small></div>
               <div id="team-controls"></div>
             </section>
+            <section class="reward-card">
+              <div class="sidebar-title"><span>원정대 보물함</span><small>학급 전체가 함께 사용</small></div>
+              <div class="reward-items" id="reward-items"></div>
+            </section>
             <section class="coverage-card">
-              <div class="coverage-copy"><span>한 번 이상 참여</span><strong id="coverage-copy">0 / 0명</strong></div>
+              <div class="coverage-copy"><span>첫 참여를 마친 모험가</span><strong id="coverage-copy">0 / 0명</strong></div>
               <div class="progress-track"><div id="coverage-bar"></div></div>
               <p id="coverage-message">첫 번째 도전을 기다리고 있어요.</p>
             </section>
@@ -165,19 +195,22 @@
 
     <section class="view" id="view-summary" aria-labelledby="summary-title">
       <div class="summary-shell">
-        <p class="eyebrow">탐험 완료</p>
-        <h1 id="summary-title">오늘, 모두가 한 걸음 내디뎠어요.</h1>
-        <p class="summary-lead" id="summary-lead">수업 참여 결과를 확인해 보세요.</p>
+        <p class="eyebrow">원정 완료</p>
+        <div class="victory-emblem" id="victory-emblem">🏆</div>
+        <h1 id="summary-title">보스의 결계를 깨뜨렸어요!</h1>
+        <p class="summary-lead" id="summary-lead">모두의 도전이 원정대를 승리로 이끌었습니다.</p>
+        <div class="loot-row" id="loot-row"></div>
         <div class="summary-metrics" id="summary-metrics"></div>
         <div class="panel summary-panel">
-          <div class="section-heading compact"><div><h2>학생별 참여 기록</h2><p>기록은 다음 수업에서 참여 기회를 조정하는 참고 자료로만 활용해 주세요.</p></div></div>
-          <div class="table-wrap"><table><thead><tr><th>학생</th><th>출석</th><th>팀</th><th>참여 횟수</th></tr></thead><tbody id="summary-table"></tbody></table></div>
+          <div class="section-heading compact"><div><h2>모험가 참여 기록</h2><p>다음 원정에서는 아직 참여가 적은 학생에게 첫 기회를 주세요.</p></div></div>
+          <div class="table-wrap"><table><thead><tr><th>모험가</th><th>참가</th><th>길드</th><th>참여 횟수</th></tr></thead><tbody id="summary-table"></tbody></table></div>
         </div>
-        <div class="summary-actions"><button class="button button-secondary" id="download-csv" type="button">CSV 기록 저장</button><button class="button button-primary" id="new-session" type="button">새 수업 준비</button></div>
+        <div class="summary-actions"><button class="button button-secondary" id="download-csv" type="button">원정 기록 CSV</button><button class="button button-primary" id="new-session" type="button">새 원정 준비</button></div>
       </div>
     </section>
   </main>
 
+  <div class="story-toast" id="story-toast" role="status" aria-live="polite"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="assets/js/curriculum.js"></script>
   <script src="assets/js/state.js"></script>

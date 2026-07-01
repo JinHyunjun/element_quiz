@@ -1,7 +1,7 @@
 /** 같은 브라우저의 교사용 화면과 학생용 화면을 동기화합니다. */
 const EQ_STATE = (() => {
-  const CHANNEL = "everyone-expedition-v2";
-  const STORAGE_KEY = "everyone_expedition_session_v2";
+  const CHANNEL = "everyone-expedition-v3";
+  const STORAGE_KEY = "everyone_expedition_session_v3";
   const TEAM_COLORS = ["#f27c66", "#79b9d2", "#f7c85b", "#9d8bd8"];
   const listeners = new Set();
   let channel = null;
